@@ -3670,6 +3670,24 @@
 							"type": "string"
 						}
 					},
+					"sections": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"monitors": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								}
+							},
+							"required": ["name", "monitors"]
+						}
+					},
 					"logo": {
 						"type": "object",
 						"properties": {
@@ -3728,6 +3746,7 @@
 					"monitors",
 					"subMonitors",
 					"originalMonitors",
+					"sections",
 					"isPublished",
 					"showCharts",
 					"showUptimePercentage",
@@ -4088,6 +4107,12 @@
 						"monitors": ["65f1c2a4d8b9e0123456789a"],
 						"subMonitors": [],
 						"originalMonitors": [],
+						"sections": [
+							{
+								"name": "Services",
+								"monitors": ["65f1c2a4d8b9e0123456789a"]
+							}
+						],
 						"isPublished": true,
 						"showCharts": true,
 						"showUptimePercentage": true,
@@ -15227,6 +15252,28 @@
 									"deleteSubmonitors": {
 										"type": "boolean"
 									},
+									"sections": {
+										"type": "array",
+										"items": {
+											"type": "object",
+											"properties": {
+												"name": {
+													"type": "string",
+													"minLength": 1,
+													"maxLength": 100
+												},
+												"monitors": {
+													"type": "array",
+													"items": {
+														"type": "string",
+														"pattern": "^[0-9a-fA-F]{24}$"
+													}
+												}
+											},
+											"required": ["name", "monitors"]
+										},
+										"maxItems": 50
+									},
 									"isPublished": {
 										"type": "boolean"
 									},
@@ -15456,6 +15503,28 @@
 									},
 									"deleteSubmonitors": {
 										"type": "boolean"
+									},
+									"sections": {
+										"type": "array",
+										"items": {
+											"type": "object",
+											"properties": {
+												"name": {
+													"type": "string",
+													"minLength": 1,
+													"maxLength": 100
+												},
+												"monitors": {
+													"type": "array",
+													"items": {
+														"type": "string",
+														"pattern": "^[0-9a-fA-F]{24}$"
+													}
+												}
+											},
+											"required": ["name", "monitors"]
+										},
+										"maxItems": 50
 									},
 									"isPublished": {
 										"type": "boolean"

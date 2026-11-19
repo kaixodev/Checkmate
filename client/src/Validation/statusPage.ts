@@ -1,6 +1,10 @@
 import { z } from "zod";
 import type { FieldPath } from "react-hook-form";
-import { STATUS_PAGE_THEMES, STATUS_PAGE_THEME_MODES } from "@/Types/StatusPage";
+import {
+	STATUS_PAGE_SECTION_NAME_MAX,
+	STATUS_PAGE_THEMES,
+	STATUS_PAGE_THEME_MODES,
+} from "@/Types/StatusPage";
 import { cssReferencesExternalResource } from "@/Utils/customCss";
 import { hostnamePattern } from "@/Validation/patterns";
 
@@ -52,6 +56,19 @@ export const statusPageSchema = z.object({
 		step: 1,
 	}),
 	monitors: z.array(z.string()).min(1, "At least one monitor is required"),
+	sections: z.array(
+		z.object({
+			name: z
+				.string()
+				.trim()
+				.min(1, "Section name is required")
+				.max(
+					STATUS_PAGE_SECTION_NAME_MAX,
+					`Section name must be at most ${STATUS_PAGE_SECTION_NAME_MAX} characters`
+				),
+			monitors: z.array(z.string()),
+		})
+	),
 	isPublished: z.boolean(),
 	showCharts: z.boolean().register(statusPageStepRegistry, { step: 1 }),
 	showUptimePercentage: z.boolean().register(statusPageStepRegistry, { step: 1 }),

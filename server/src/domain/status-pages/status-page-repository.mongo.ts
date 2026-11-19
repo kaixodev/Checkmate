@@ -46,6 +46,7 @@ class MongoStatusPagesRepository implements IStatusPagesRepository {
 			monitors: this.mapIdArray(doc.monitors),
 			subMonitors: this.mapIdArray(doc.subMonitors),
 			originalMonitors: this.mapIdArray(doc.originalMonitors),
+			sections: (doc.sections ?? []).map((section) => ({ name: section.name, monitors: this.mapIdArray(section.monitors) })),
 			logo: this.mapLogo(doc.logo),
 			isPublished: doc.isPublished,
 			showCharts: doc.showCharts,
@@ -183,6 +184,8 @@ class MongoStatusPagesRepository implements IStatusPagesRepository {
 
 	removeMonitorFromStatusPages = async (monitorId: string): Promise<number> => {
 		const res = await StatusPageModel.updateMany({ monitors: monitorId }, { $pull: { monitors: monitorId } });
+		// Separate query: "$[]" fails on documents saved before sections existed
+		await StatusPageModel.updateMany({ "sections.monitors": monitorId }, { $pull: { "sections.$[].monitors": monitorId } });
 		return res.modifiedCount;
 	};
 }

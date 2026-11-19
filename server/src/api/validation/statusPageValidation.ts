@@ -1,7 +1,14 @@
 import { z } from "zod";
 import { publicIncidentSchema } from "@/domain/incidents/incident.schema.js";
 import { booleanCoercion, dnsHostnameRegex, timezoneValidation } from "./shared.js";
-import { StatusPageTypes, StatusPageThemes, StatusPageThemeModes, StatusPageRanges } from "@/domain/status-pages/status-page.type.js";
+import {
+	StatusPageTypes,
+	StatusPageThemes,
+	StatusPageThemeModes,
+	StatusPageRanges,
+	STATUS_PAGE_SECTION_NAME_MAX_LENGTH,
+	STATUS_PAGE_SECTIONS_MAX,
+} from "@/domain/status-pages/status-page.type.js";
 import { normalizeStatusPageDomain } from "@/utils/statusPageDomain.js";
 import { cssReferencesExternalResource } from "@/utils/customCss.js";
 import { ImageMimeTypes } from "@/types/upload.js";
@@ -33,6 +40,27 @@ export const resolveStatusPageQueryValidation = getStatusPageQueryValidation.ext
 	domain: z.string().optional(),
 });
 
+// Sent as a JSON string because the create/update body is multipart form data
+const sectionsValidation = z.preprocess(
+	(val) => {
+		if (typeof val !== "string") return val;
+		try {
+			return JSON.parse(val);
+		} catch {
+			return val;
+		}
+	},
+	z
+		.array(
+			z.object({
+				name: z.string().trim().min(1, "Section name is required").max(STATUS_PAGE_SECTION_NAME_MAX_LENGTH),
+				monitors: z.array(z.string().regex(/^[0-9a-fA-F]{24}$/, "Must be a valid monitor ID")),
+			})
+		)
+		.max(STATUS_PAGE_SECTIONS_MAX)
+		.optional()
+);
+
 const customDomainValidation = z.preprocess(
 	(val) => {
 		if (val === undefined || val === null) {
@@ -56,6 +84,7 @@ export const createStatusPageBodyValidation = z
 		monitors: z.array(z.string().regex(/^[0-9a-fA-F]{24}$/, "Must be a valid monitor ID")).min(1, "At least one monitor is required"),
 		subMonitors: z.array(z.string().regex(/^[0-9a-fA-F]{24}$/)).optional(),
 		deleteSubmonitors: z.boolean().optional(),
+		sections: sectionsValidation,
 		isPublished: booleanCoercion,
 		showCharts: booleanCoercion.optional(),
 		showUptimePercentage: booleanCoercion,

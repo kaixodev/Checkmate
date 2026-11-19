@@ -1,11 +1,11 @@
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { TriangleAlert } from "lucide-react";
+import { ChevronDown, TriangleAlert } from "lucide-react";
 
 import type { SxProps, Theme } from "@mui/material/styles";
 import type { Monitor } from "@/Types/Monitor";
-import type { StatusPage, StatusPageRange } from "@/Types/StatusPage";
+import type { StatusPage, StatusPageRange, StatusPageSection } from "@/Types/StatusPage";
 import {
 	getMonitorTypeLabel,
 	STATUS_PAGE_RANGE_DAYS,
@@ -106,6 +106,43 @@ interface Props {
 	checkTTLDays?: number;
 }
 
+interface MonitorGroup {
+	key: string;
+	name: string | null;
+	monitors: StatusPageMonitor[];
+}
+
+// Monitors in no section come first without a heading, then each section in order.
+// Sections with no monitors on the page are left out.
+const groupMonitors = (
+	monitors: StatusPageMonitor[],
+	sections: StatusPageSection[]
+): MonitorGroup[] => {
+	const byId = new Map(monitors.map((monitor) => [monitor.id, monitor]));
+	const placed = new Set<string>();
+	const named = sections.map((section, index) => ({
+		key: String(index),
+		name: section.name,
+		monitors: section.monitors.flatMap((id) => {
+			const monitor = byId.get(id);
+			if (!monitor || placed.has(id)) return [];
+			placed.add(id);
+			return [monitor];
+		}),
+	}));
+	const ungrouped = monitors.filter((monitor) => !placed.has(monitor.id));
+	return [
+		...(ungrouped.length ? [{ key: "ungrouped", name: null, monitors: ungrouped }] : []),
+		...named.filter((group) => group.monitors.length > 0),
+	];
+};
+
+type FlatSx = Exclude<SxProps<Theme>, readonly unknown[] | ((theme: Theme) => unknown)>;
+const extendSx = (base: SxProps<Theme>, overrides: SxProps<Theme>): SxProps<Theme> => [
+	base as FlatSx,
+	overrides as FlatSx,
+];
+
 export const BaseStatusPage = ({
 	statusPage,
 	monitors,
@@ -137,6 +174,120 @@ export const BaseStatusPage = ({
 	const logoSrc = statusPage.logo?.data
 		? `data:${statusPage.logo.contentType};base64,${statusPage.logo.data}`
 		: null;
+
+	const groups = useMemo(
+		() => groupMonitors(monitors, statusPage.sections ?? []),
+		[monitors, statusPage.sections]
+	);
+	const [collapsedKeys, setCollapsedKeys] = useState<Set<string>>(() => new Set());
+	const toggleSection = (key: string) =>
+		setCollapsedKeys((previous) => {
+			const next = new Set(previous);
+			if (next.has(key)) next.delete(key);
+			else next.add(key);
+			return next;
+		});
+
+	const renderMonitor = (monitor: StatusPageMonitor) => {
+		const isHardware = monitor.type === "hardware";
+		const showInfra = isHardware && statusPage.showInfrastructure !== false;
+		const showChart = !isHardware && statusPage.showCharts !== false;
+		const badgeTone = monitorBadgeTone(monitor.status);
+		const uptimePercentage = formatPercentage(monitor.uptimePercentage ?? 0);
+
+		const cells =
+			range === "latest"
+				? checksToCells(monitor.recentChecks ?? [], bucketTimezone)
+				: dailyBucketsToCells(
+						monitor.dailyChecks ?? [],
+						STATUS_PAGE_RANGE_DAYS[range],
+						bucketTimezone,
+						t
+					);
+
+		return (
+			<Box
+				component="li"
+				key={monitor.id}
+				sx={styles.card}
+			>
+				<Box sx={styles.cardRow}>
+					<Box sx={styles.monitorName}>{monitor.name}</Box>
+					<Box
+						component="span"
+						sx={styles.badge(badgeTone)}
+					>
+						{t(statusBadgeKey[monitor.status])}
+					</Box>
+					<Stack
+						direction={{ xs: "column", md: "row" }}
+						sx={styles.monitorMeta}
+					>
+						<Box
+							component="span"
+							sx={isHardware ? styles.pillHardware : styles.pill}
+						>
+							{getMonitorTypeLabel(monitor.type, t)}
+						</Box>
+						<Box
+							component="span"
+							sx={{ ...styles.pill }}
+						>
+							{uptimePercentage}
+						</Box>
+						{monitor.url && (
+							<Box
+								component="span"
+								sx={styles.monitorUrl}
+								title={monitor.url}
+							>
+								{monitor.url}
+							</Box>
+						)}
+					</Stack>
+				</Box>
+
+				{showInfra && (
+					<ThemedInfrastructure
+						monitor={monitor}
+						sxApi={{
+							containerSx: styles.infra,
+							emptySx: styles.infraEmpty,
+							gaugeSx: styles.gauge,
+							gaugeLabelSx: styles.gaugeLabel,
+							gaugeValueSx: styles.gaugeValue,
+							gaugeBarSx: styles.gaugeBar,
+							gaugeFillSx: styles.gaugeFill,
+							gaugeSubSx: styles.gaugeSub,
+						}}
+					/>
+				)}
+				{showChart &&
+					(chartMode === "heatmap" ? (
+						<ThemedHeatmap
+							cells={cells}
+							containerSx={styles.heatmap}
+							cellSx={styles.heatmapCell}
+							onCellClick={(date) => {
+								setSelectedMonitorId(monitor.id);
+								setSelectedDate(date);
+							}}
+						/>
+					) : (
+						<ThemedHistogram
+							cells={cells}
+							containerSx={styles.histogram}
+							barSx={styles.bar}
+							statsSx={styles.chartStats}
+							onCellClick={(date) => {
+								setSelectedMonitorId(monitor.id);
+								setSelectedDate(date);
+							}}
+						/>
+					))}
+			</Box>
+		);
+	};
 
 	const { HeaderSlot, HeroSlot } = config;
 
@@ -248,111 +399,75 @@ export const BaseStatusPage = ({
 				</Stack>
 			)}
 
-			<Stack
-				component="ul"
-				sx={styles.monitorList}
-			>
-				{monitors.map((monitor) => {
-					const isHardware = monitor.type === "hardware";
-					const showInfra = isHardware && statusPage.showInfrastructure !== false;
-					const showChart = !isHardware && statusPage.showCharts !== false;
-					const badgeTone = monitorBadgeTone(monitor.status);
-					const uptimePercentage = formatPercentage(monitor.uptimePercentage ?? 0);
-
-					const cells =
-						range === "latest"
-							? checksToCells(monitor.recentChecks ?? [], bucketTimezone)
-							: dailyBucketsToCells(
-									monitor.dailyChecks ?? [],
-									STATUS_PAGE_RANGE_DAYS[range],
-									bucketTimezone,
-									t
-								);
-
-					return (
-						<Box
-							component="li"
-							key={monitor.id}
-							sx={styles.card}
-						>
-							<Box sx={styles.cardRow}>
-								<Box sx={styles.monitorName}>{monitor.name}</Box>
+			{groups.map((group) => {
+				const collapsed = group.name !== null && collapsedKeys.has(group.key);
+				return (
+					<Box
+						component="section"
+						key={group.key}
+						className="status-page-section"
+						data-collapsed={collapsed}
+						mt={group.name !== null ? "24px" : 0}
+					>
+						{group.name !== null && (
+							<Box
+								component="h2"
+								m={0}
+								mb="12px"
+								className="status-page-section-title"
+							>
 								<Box
-									component="span"
-									sx={styles.badge(badgeTone)}
+									component="button"
+									type="button"
+									aria-expanded={!collapsed}
+									aria-controls={`status-page-section-${group.key}`}
+									title={t("pages.statusPages.sectionToggle", { name: group.name })}
+									onClick={() => toggleSection(group.key)}
+									display="flex"
+									alignItems="center"
+									gap="8px"
+									p={0}
+									border={0}
+									bgcolor="transparent"
+									color="inherit"
+									sx={extendSx(styles.monitorName, {
+										fontSize: 20,
+										whiteSpace: "normal",
+										cursor: "pointer",
+										font: "inherit",
+										fontWeight: 600,
+									})}
 								>
-									{t(statusBadgeKey[monitor.status])}
+									<Box
+										component="span"
+										display="flex"
+										sx={{
+											transition: "transform 150ms",
+											transform: collapsed ? "rotate(-90deg)" : "none",
+										}}
+									>
+										<Icon
+											icon={ChevronDown}
+											size={20}
+											color={tokens.textMuted}
+										/>
+									</Box>
+									{group.name}
 								</Box>
-								<Stack
-									direction={{ xs: "column", md: "row" }}
-									sx={styles.monitorMeta}
-								>
-									<Box
-										component="span"
-										sx={isHardware ? styles.pillHardware : styles.pill}
-									>
-										{getMonitorTypeLabel(monitor.type, t)}
-									</Box>
-									<Box
-										component="span"
-										sx={{ ...styles.pill }}
-									>
-										{uptimePercentage}
-									</Box>
-									{monitor.url && (
-										<Box
-											component="span"
-											sx={styles.monitorUrl}
-											title={monitor.url}
-										>
-											{monitor.url}
-										</Box>
-									)}
-								</Stack>
 							</Box>
-
-							{showInfra && (
-								<ThemedInfrastructure
-									monitor={monitor}
-									sxApi={{
-										containerSx: styles.infra,
-										emptySx: styles.infraEmpty,
-										gaugeSx: styles.gauge,
-										gaugeLabelSx: styles.gaugeLabel,
-										gaugeValueSx: styles.gaugeValue,
-										gaugeBarSx: styles.gaugeBar,
-										gaugeFillSx: styles.gaugeFill,
-										gaugeSubSx: styles.gaugeSub,
-									}}
-								/>
-							)}
-							{showChart &&
-								(chartMode === "heatmap" ? (
-									<ThemedHeatmap
-										cells={cells}
-										containerSx={styles.heatmap}
-										cellSx={styles.heatmapCell}
-										onCellClick={(date) => {
-											setSelectedMonitorId(monitor.id);
-											setSelectedDate(date);
-										}}
-									/>
-								) : (
-									<ThemedHistogram
-										cells={cells}
-										containerSx={styles.histogram}
-										barSx={styles.bar}
-										statsSx={styles.chartStats}
-										onCellClick={(date) => {
-											setSelectedMonitorId(monitor.id);
-											setSelectedDate(date);
-										}}
-									/>
-								))}
-						</Box>
-					);
-				})}
-			</Stack>
+						)}
+						{!collapsed && (
+							<Stack
+								component="ul"
+								id={`status-page-section-${group.key}`}
+								sx={styles.monitorList}
+							>
+								{group.monitors.map(renderMonitor)}
+							</Stack>
+						)}
+					</Box>
+				);
+			})}
 
 			<ThemedIncidentHistory
 				incidents={incidents}

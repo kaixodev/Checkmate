@@ -43,6 +43,7 @@ export const useStatusPageForm = ({
 			type: data?.type || ["uptime"],
 			color: data?.color || "#13715B",
 			monitors: data?.monitors || [],
+			sections: data?.sections ?? [],
 			isPublished: data?.isPublished ?? false,
 			showCharts: data?.showCharts ?? true,
 			showUptimePercentage: data?.showUptimePercentage ?? true,

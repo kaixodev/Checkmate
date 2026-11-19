@@ -4,10 +4,16 @@ import {
 	DEFAULT_STATUS_PAGE_THEME,
 	DEFAULT_STATUS_PAGE_THEME_MODE,
 	DEFAULT_STATUS_PAGE_TIMEZONE,
+	STATUS_PAGE_SECTION_NAME_MAX_LENGTH,
 	StatusPageThemeModes,
 	StatusPageThemes,
 	StatusPageTypes,
 } from "@/domain/status-pages/status-page.type.js";
+
+interface StatusPageSectionDocument {
+	name: string;
+	monitors: Types.ObjectId[];
+}
 
 interface StatusPageLogoDocument {
 	data: Buffer;
@@ -16,11 +22,12 @@ interface StatusPageLogoDocument {
 
 type StatusPageDocumentBase = Omit<
 	StatusPage,
-	"id" | "userId" | "teamId" | "monitors" | "subMonitors" | "originalMonitors" | "logo" | "createdAt" | "updatedAt"
+	"id" | "userId" | "teamId" | "monitors" | "subMonitors" | "originalMonitors" | "sections" | "logo" | "createdAt" | "updatedAt"
 > & {
 	monitors: Types.ObjectId[];
 	subMonitors: Types.ObjectId[];
 	originalMonitors?: Types.ObjectId[];
+	sections?: StatusPageSectionDocument[];
 	logo?: StatusPageLogoDocument | null;
 };
 
@@ -36,6 +43,14 @@ const logoSchema = new Schema<StatusPageLogoDocument>(
 	{
 		data: { type: Buffer },
 		contentType: { type: String },
+	},
+	{ _id: false }
+);
+
+const sectionSchema = new Schema<StatusPageSectionDocument>(
+	{
+		name: { type: String, required: true, trim: true, maxlength: STATUS_PAGE_SECTION_NAME_MAX_LENGTH },
+		monitors: [{ type: Schema.Types.ObjectId, ref: "Monitor" }],
 	},
 	{ _id: false }
 );
@@ -99,6 +114,10 @@ const StatusPageSchema = new Schema<StatusPageDocument>(
 				required: true,
 			},
 		],
+		sections: {
+			type: [sectionSchema],
+			default: [],
+		},
 		logo: {
 			type: logoSchema,
 			default: null,
@@ -151,6 +170,6 @@ StatusPageSchema.index(
 
 const StatusPageModel = model<StatusPageDocument>("StatusPage", StatusPageSchema);
 
-export type { StatusPageDocument, StatusPageLogoDocument };
+export type { StatusPageDocument, StatusPageLogoDocument, StatusPageSectionDocument };
 export { StatusPageModel };
 export default StatusPageModel;

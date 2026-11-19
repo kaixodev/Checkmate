@@ -2122,6 +2122,23 @@
 						}
 					}
 				},
+				"sections": {
+					"title": "Sections",
+					"description": "Group monitors under headings, like \"Services\" or \"Game servers\". Monitors not in a section are listed first.",
+					"empty": "No sections yet. The page shows one list of monitors.",
+					"add": "Add section",
+					"remove": "Remove section",
+					"option": {
+						"name": {
+							"label": "Section name",
+							"placeholder": "Services"
+						},
+						"monitors": {
+							"label": "Monitors in this section",
+							"placeholder": "Pick from the monitors on this page..."
+						}
+					}
+				},
 				"timezone": {
 					"title": "Timezone",
 					"description": "Select the timezone that your status page will be displayed in.",
@@ -2254,7 +2271,8 @@
 						"content": "Enter the incident text."
 					}
 				}
-			}
+			},
+			"sectionToggle": "Show or hide {{name}}"
 		},
 		"uptime": {
 			"filters": {

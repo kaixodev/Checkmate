@@ -3,6 +3,7 @@ import type {
 	publicStatusPageMonitorSchema,
 	publicStatusPagePayloadSchema,
 	statusPageLogoSchema,
+	statusPageSectionSchema,
 	statusPageSchema,
 } from "@/domain/status-pages/status-page.schema.js";
 
@@ -19,6 +20,9 @@ export const DEFAULT_STATUS_PAGE_THEME_MODE: StatusPageThemeMode = "auto";
 
 export const DEFAULT_STATUS_PAGE_TIMEZONE = "UTC";
 
+export const STATUS_PAGE_SECTION_NAME_MAX_LENGTH = 100;
+export const STATUS_PAGE_SECTIONS_MAX = 50;
+
 export const StatusPageDayRanges = ["30d", "60d", "90d"] as const;
 export type StatusPageDayRange = (typeof StatusPageDayRanges)[number];
 export const StatusPageRanges = ["latest", ...StatusPageDayRanges] as const;
@@ -30,6 +34,7 @@ export const STATUS_PAGE_RANGE_DAYS: Record<StatusPageDayRange, number> = {
 };
 
 export type StatusPageLogo = z.infer<typeof statusPageLogoSchema>;
+export type StatusPageSection = z.infer<typeof statusPageSectionSchema>;
 export type StatusPage = z.infer<typeof statusPageSchema>;
 export type PublicStatusPageMonitor = z.infer<typeof publicStatusPageMonitorSchema>;
 export type PublicStatusPagePayload = z.infer<typeof publicStatusPagePayloadSchema>;

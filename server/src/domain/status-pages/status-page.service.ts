@@ -89,6 +89,24 @@ export class StatusPageService implements IStatusPageService {
 	private normalizeInput = (data: Partial<StatusPage>): Partial<StatusPage> =>
 		this.settingsService.areStatusPageThemesEnabled() ? data : this.withoutThemeFields(data);
 
+	// A section can only list monitors that are on the page, and a monitor sits in at most one section
+	private normalizeSections = (data: Partial<StatusPage>): Partial<StatusPage> => {
+		if (!data.sections) {
+			return data;
+		}
+		const onPage = new Set(data.monitors ?? []);
+		const placed = new Set<string>();
+		const sections = data.sections.map((section) => ({
+			name: section.name.trim(),
+			monitors: section.monitors.filter((id) => {
+				if ((data.monitors && !onPage.has(id)) || placed.has(id)) return false;
+				placed.add(id);
+				return true;
+			}),
+		}));
+		return { ...data, sections };
+	};
+
 	private toPublicMonitor = (monitor: Monitor, showURL: boolean) => {
 		const base = {
 			id: monitor.id,
@@ -127,7 +145,7 @@ export class StatusPageService implements IStatusPageService {
 		image: Express.Multer.File | undefined,
 		data: Partial<StatusPage>
 	): Promise<StatusPage> => {
-		const normalizedData = this.normalizeCustomDomainInput(this.normalizeInput(data));
+		const normalizedData = this.normalizeSections(this.normalizeCustomDomainInput(this.normalizeInput(data)));
 		const created = await this.statusPagesRepository.create(userId, teamId, image, normalizedData);
 		return this.normalizeTheme(created);
 	};
@@ -225,7 +243,7 @@ export class StatusPageService implements IStatusPageService {
 	};
 
 	updateStatusPage = async (id: string, teamId: string, image: Express.Multer.File | undefined, data: Partial<StatusPage>): Promise<StatusPage> => {
-		const normalizedData = this.normalizeCustomDomainInput(this.normalizeInput(data));
+		const normalizedData = this.normalizeSections(this.normalizeCustomDomainInput(this.normalizeInput(data)));
 		const updated = await this.statusPagesRepository.updateById(id, teamId, image, normalizedData);
 		return this.normalizeTheme(updated);
 	};

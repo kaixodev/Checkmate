@@ -8,6 +8,13 @@ export const statusPageLogoSchema = z.object({
 	contentType: z.string(),
 });
 
+// A named group of monitors shown under its own heading. Monitors in no section are
+// listed first, without a heading.
+export const statusPageSectionSchema = z.object({
+	name: z.string(),
+	monitors: z.array(z.string()),
+});
+
 export const statusPageSchema = z
 	.object({
 		id: z.string(),
@@ -22,6 +29,7 @@ export const statusPageSchema = z
 		monitors: z.array(z.string()),
 		subMonitors: z.array(z.string()),
 		originalMonitors: z.array(z.string()),
+		sections: z.array(statusPageSectionSchema),
 		logo: statusPageLogoSchema.optional(),
 		isPublished: z.boolean(),
 		showCharts: z.boolean(),
@@ -59,6 +67,7 @@ const publicStatusPagePayloadExample = {
 		monitors: ["65f1c2a4d8b9e0123456789a"],
 		subMonitors: [],
 		originalMonitors: [],
+		sections: [{ name: "Services", monitors: ["65f1c2a4d8b9e0123456789a"] }],
 		isPublished: true,
 		showCharts: true,
 		showUptimePercentage: true,

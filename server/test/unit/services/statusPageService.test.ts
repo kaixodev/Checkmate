@@ -235,6 +235,34 @@ describe("StatusPageService", () => {
 	});
 
 	describe("updateStatusPage", () => {
+		it("keeps only page monitors in sections, each in one section", async () => {
+			const { service, repo } = createService(true);
+
+			await service.updateStatusPage("sp-1", "team-1", undefined, {
+				monitors: ["mon-1", "mon-2", "mon-3"],
+				sections: [
+					{ name: "  Services ", monitors: ["mon-1", "mon-9", "mon-2"] },
+					{ name: "Misc", monitors: ["mon-2", "mon-3"] },
+				],
+			});
+
+			expect(repo.updateById).toHaveBeenCalledWith("sp-1", "team-1", undefined, {
+				monitors: ["mon-1", "mon-2", "mon-3"],
+				sections: [
+					{ name: "Services", monitors: ["mon-1", "mon-2"] },
+					{ name: "Misc", monitors: ["mon-3"] },
+				],
+			});
+		});
+
+		it("leaves sections out of the patch when none are sent", async () => {
+			const { service, repo } = createService(true);
+
+			await service.updateStatusPage("sp-1", "team-1", undefined, { monitors: ["mon-1"] });
+
+			expect(repo.updateById).toHaveBeenCalledWith("sp-1", "team-1", undefined, { monitors: ["mon-1"] });
+		});
+
 		it("delegates to repository with all parameters", async () => {
 			const { service, repo } = createService(true);
 			const updated = makeStatusPage({ companyName: "Updated Co" });

@@ -29,6 +29,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { mutate } from "swr";
 import { HeaderConfigStatusControls } from "./Components/HeaderConfigStatusControls";
 import { ThemePicker } from "./Components/ThemePicker";
+import { SectionsField } from "./Components/SectionsField";
 import { FormSwitchField } from "@/Components/inputs/forms/FormSwitchField";
 import { FormTextField } from "@/Components/inputs/forms/FormTextField";
 import { FormMultiSelectField } from "@/Components/inputs/forms/FormMultiSelectField";
@@ -198,6 +199,14 @@ const CreateStatusPage = () => {
 			fd.append("monitors[]", monitorId);
 		});
 
+		// Drop monitors that were taken off the page after being put in a section
+		const onPage = new Set(data.monitors);
+		const sections = data.sections.map((section) => ({
+			name: section.name.trim(),
+			monitors: section.monitors.filter((id) => onPage.has(id)),
+		}));
+		fd.append("sections", JSON.stringify(sections));
+
 		data.type.forEach((type) => {
 			fd.append("type[]", type);
 		});
@@ -333,6 +342,13 @@ const CreateStatusPage = () => {
 								renderRow={(monitor) => <MonitorSelectedRow monitor={monitor} />}
 							/>
 						}
+					/>
+				)}
+				{showStep(0) && (
+					<ConfigBox
+						title={t("pages.statusPages.form.sections.title")}
+						subtitle={t("pages.statusPages.form.sections.description")}
+						rightContent={<SectionsField monitors={monitors} />}
 					/>
 				)}
 				{showStep(0) && (

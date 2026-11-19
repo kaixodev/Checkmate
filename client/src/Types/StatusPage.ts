@@ -49,6 +49,13 @@ export const resolveStatusPageThemeMode = (
 	STATUS_PAGE_THEME_MODES.find((m) => m === value) ?? DEFAULT_STATUS_PAGE_THEME_MODE;
 export const PUBLIC_STATUS_PAGE_PREFIX = "/status/public";
 
+export interface StatusPageSection {
+	name: string;
+	monitors: string[];
+}
+
+export const STATUS_PAGE_SECTION_NAME_MAX = 100;
+
 export interface StatusPage {
 	id: string;
 	userId: string;
@@ -62,6 +69,7 @@ export interface StatusPage {
 	monitors: string[];
 	subMonitors: string[];
 	originalMonitors?: string[];
+	sections?: StatusPageSection[];
 	logo?: {
 		data: string;
 		contentType: string;
