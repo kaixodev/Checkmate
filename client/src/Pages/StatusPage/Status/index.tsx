@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { useIsAdmin } from "@/Hooks/useIsAdmin";
 import { useLocation, useParams } from "react-router-dom";
 import { useGet } from "@/Hooks/UseApi";
+import { useDocumentHead } from "@/Hooks/useDocumentHead";
 import {
 	isStatusPageRange,
 	resolveStatusPageTheme,
@@ -125,6 +126,16 @@ const StatusPageView = () => {
 
 	const statusPage = data?.statusPage;
 	const monitors = data?.monitors ?? [];
+
+	// Public pages take their tab title from the company name and their favicon
+	// from the uploaded logo; the admin view keeps Checkmate's own.
+	const logoHref = statusPage?.logo?.data
+		? `data:${statusPage.logo.contentType};base64,${statusPage.logo.data}`
+		: null;
+	useDocumentHead({
+		title: isPublic ? statusPage?.companyName : null,
+		iconHref: isPublic ? logoHref : null,
+	});
 
 	if (!statusPage) return null;
 
