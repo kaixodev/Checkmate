@@ -1,6 +1,7 @@
 import { type IIncidentsRepository } from "@/domain/incidents/incident.repository.interface.js";
 import type { Incident, PublicIncident } from "@/domain/incidents/incident.type.js";
 import { type IStatusPagesRepository } from "@/domain/status-pages/status-page-repository.interface.js";
+import { type IStatusPageIncidentsRepository } from "@/domain/status-page-incidents/status-page-incident.repository.interface.js";
 import { ISettingsService } from "@/domain/app-settings/app-settings.service.js";
 import { IMonitorsRepository } from "@/domain/monitors/monitor.repository.interface.js";
 import { IChecksRepository } from "@/domain/checks/check.repository.interface.js";
@@ -46,7 +47,8 @@ export class StatusPageService implements IStatusPageService {
 		private settingsService: ISettingsService,
 		private monitorsRepository: IMonitorsRepository,
 		private checksRepository: IChecksRepository,
-		private incidentsRepository: IIncidentsRepository
+		private incidentsRepository: IIncidentsRepository,
+		private statusPageIncidentsRepository: IStatusPageIncidentsRepository
 	) {}
 
 	private assertCustomDomainAllowed = (customDomain: string | null | undefined) => {
@@ -229,6 +231,8 @@ export class StatusPageService implements IStatusPageService {
 	};
 
 	deleteStatusPage = async (statusPageId: string, teamId: string): Promise<StatusPage> => {
-		return await this.statusPagesRepository.deleteById(statusPageId, teamId);
+		const deleted = await this.statusPagesRepository.deleteById(statusPageId, teamId);
+		await this.statusPageIncidentsRepository.deleteByStatusPageId(statusPageId, teamId);
+		return deleted;
 	};
 }

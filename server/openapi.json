@@ -4124,6 +4124,99 @@
 					]
 				}
 			},
+			"StatusPageIncident": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"example": "65f1c2a4d8b9e0123456789d"
+					},
+					"statusPageId": {
+						"type": "string",
+						"example": "65f1c2a4d8b9e0123456789b"
+					},
+					"teamId": {
+						"type": "string",
+						"example": "65f1c2a4d8b9e01234567890"
+					},
+					"title": {
+						"type": "string",
+						"example": "Scheduled database upgrade"
+					},
+					"content": {
+						"type": "string",
+						"example": "We are upgrading the database. Expect brief interruptions.",
+						"description": "Markdown"
+					},
+					"style": {
+						"type": "string",
+						"enum": ["info", "warning", "danger", "primary", "light", "dark"],
+						"example": "warning"
+					},
+					"pinned": {
+						"type": "boolean",
+						"example": true,
+						"description": "Shown as the banner at the top of the status page"
+					},
+					"active": {
+						"type": "boolean",
+						"example": true,
+						"description": "false once the incident is resolved"
+					},
+					"createdAt": {
+						"type": "string",
+						"example": "2026-04-15T03:21:00.000Z"
+					},
+					"updatedAt": {
+						"type": "string",
+						"example": "2026-04-15T03:34:00.000Z"
+					}
+				},
+				"required": ["id", "statusPageId", "teamId", "title", "content", "style", "pinned", "active", "createdAt", "updatedAt"]
+			},
+			"PublicStatusPageIncident": {
+				"type": "object",
+				"nullable": true,
+				"properties": {
+					"id": {
+						"type": "string",
+						"example": "65f1c2a4d8b9e0123456789d"
+					},
+					"title": {
+						"type": "string",
+						"example": "Scheduled database upgrade"
+					},
+					"content": {
+						"type": "string",
+						"example": "We are upgrading the database. Expect brief interruptions.",
+						"description": "Markdown"
+					},
+					"style": {
+						"type": "string",
+						"enum": ["info", "warning", "danger", "primary", "light", "dark"],
+						"example": "warning"
+					},
+					"pinned": {
+						"type": "boolean",
+						"example": true,
+						"description": "Shown as the banner at the top of the status page"
+					},
+					"active": {
+						"type": "boolean",
+						"example": true,
+						"description": "false once the incident is resolved"
+					},
+					"createdAt": {
+						"type": "string",
+						"example": "2026-04-15T03:21:00.000Z"
+					},
+					"updatedAt": {
+						"type": "string",
+						"example": "2026-04-15T03:34:00.000Z"
+					}
+				},
+				"required": ["id", "title", "content", "style", "pinned", "active", "createdAt", "updatedAt"]
+			},
 			"LogEntry": {
 				"type": "object",
 				"properties": {
@@ -16012,6 +16105,866 @@
 					},
 					"404": {
 						"description": "Status page not found, or monitor not found on this status page",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too many requests",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/status-page-incidents/status-page/{statusPageId}": {
+			"get": {
+				"tags": ["status-page-incident"],
+				"summary": "List incidents posted on a status page, newest first",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"schema": {
+							"type": "string",
+							"pattern": "^[0-9a-fA-F]{24}$"
+						},
+						"required": true,
+						"name": "statusPageId",
+						"in": "path"
+					},
+					{
+						"schema": {
+							"type": "string",
+							"pattern": "^[0-9a-fA-F]{24}$"
+						},
+						"required": false,
+						"name": "cursor",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"enum": [true]
+										},
+										"msg": {
+											"type": "string"
+										},
+										"data": {
+											"type": "object",
+											"properties": {
+												"incidents": {
+													"type": "array",
+													"items": {
+														"$ref": "#/components/schemas/StatusPageIncident"
+													}
+												},
+												"total": {
+													"type": "number",
+													"example": 12
+												},
+												"nextCursor": {
+													"type": "string",
+													"nullable": true,
+													"example": "65f1c2a4d8b9e0123456789d"
+												},
+												"hasMore": {
+													"type": "boolean",
+													"example": true
+												}
+											},
+											"required": ["incidents", "total", "nextCursor", "hasMore"]
+										}
+									},
+									"required": ["success", "msg", "data"]
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Status page not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too many requests",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": ["status-page-incident"],
+				"summary": "Post an incident on a status page; it is pinned as the page's banner (admin/superadmin)",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"schema": {
+							"type": "string",
+							"pattern": "^[0-9a-fA-F]{24}$"
+						},
+						"required": true,
+						"name": "statusPageId",
+						"in": "path"
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"title": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 255
+									},
+									"content": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 10000
+									},
+									"style": {
+										"type": "string",
+										"enum": ["info", "warning", "danger", "primary", "light", "dark"],
+										"default": "warning"
+									}
+								},
+								"required": ["title", "content"],
+								"additionalProperties": false
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"enum": [true]
+										},
+										"msg": {
+											"type": "string"
+										},
+										"data": {
+											"$ref": "#/components/schemas/StatusPageIncident"
+										}
+									},
+									"required": ["success", "msg", "data"]
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Status page not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too many requests",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/status-page-incidents/status-page/{statusPageId}/unpin": {
+			"post": {
+				"tags": ["status-page-incident"],
+				"summary": "Remove the banner from a status page without resolving its incidents (admin/superadmin)",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"schema": {
+							"type": "string",
+							"pattern": "^[0-9a-fA-F]{24}$"
+						},
+						"required": true,
+						"name": "statusPageId",
+						"in": "path"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"enum": [true]
+										},
+										"msg": {
+											"type": "string"
+										},
+										"data": {
+											"type": "object",
+											"properties": {
+												"unpinned": {
+													"type": "number",
+													"example": 1
+												}
+											},
+											"required": ["unpinned"]
+										}
+									},
+									"required": ["success", "msg", "data"]
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Status page not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too many requests",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/status-page-incidents/{id}": {
+			"patch": {
+				"tags": ["status-page-incident"],
+				"summary": "Edit a status page incident (admin/superadmin)",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"schema": {
+							"type": "string",
+							"pattern": "^[0-9a-fA-F]{24}$"
+						},
+						"required": true,
+						"name": "id",
+						"in": "path"
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"title": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 255
+									},
+									"content": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 10000
+									},
+									"style": {
+										"type": "string",
+										"enum": ["info", "warning", "danger", "primary", "light", "dark"]
+									},
+									"pinned": {
+										"type": "boolean"
+									}
+								},
+								"additionalProperties": false
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"enum": [true]
+										},
+										"msg": {
+											"type": "string"
+										},
+										"data": {
+											"$ref": "#/components/schemas/StatusPageIncident"
+										}
+									},
+									"required": ["success", "msg", "data"]
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Status page incident not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too many requests",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"tags": ["status-page-incident"],
+				"summary": "Delete a status page incident (admin/superadmin)",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"schema": {
+							"type": "string",
+							"pattern": "^[0-9a-fA-F]{24}$"
+						},
+						"required": true,
+						"name": "id",
+						"in": "path"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"enum": [true]
+										},
+										"msg": {
+											"type": "string"
+										}
+									},
+									"required": ["success", "msg"]
+								},
+								"example": {
+									"success": true,
+									"msg": "OK"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Status page incident not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too many requests",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/status-page-incidents/{id}/resolve": {
+			"post": {
+				"tags": ["status-page-incident"],
+				"summary": "Resolve a status page incident and unpin it (admin/superadmin)",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"schema": {
+							"type": "string",
+							"pattern": "^[0-9a-fA-F]{24}$"
+						},
+						"required": true,
+						"name": "id",
+						"in": "path"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"enum": [true]
+										},
+										"msg": {
+											"type": "string"
+										},
+										"data": {
+											"$ref": "#/components/schemas/StatusPageIncident"
+										}
+									},
+									"required": ["success", "msg", "data"]
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Status page incident not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too many requests",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/status-page-incidents/public/{url}": {
+			"get": {
+				"tags": ["status-page-incident"],
+				"summary": "Get the pinned incident and incident history of a public status page",
+				"parameters": [
+					{
+						"schema": {
+							"type": "string",
+							"minLength": 1
+						},
+						"required": true,
+						"name": "url",
+						"in": "path"
+					},
+					{
+						"schema": {
+							"type": "string",
+							"pattern": "^[0-9a-fA-F]{24}$"
+						},
+						"required": false,
+						"name": "cursor",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"enum": [true]
+										},
+										"msg": {
+											"type": "string"
+										},
+										"data": {
+											"type": "object",
+											"properties": {
+												"pinned": {
+													"$ref": "#/components/schemas/PublicStatusPageIncident"
+												},
+												"incidents": {
+													"type": "array",
+													"items": {
+														"$ref": "#/components/schemas/PublicStatusPageIncident"
+													}
+												},
+												"total": {
+													"type": "number",
+													"example": 12
+												},
+												"nextCursor": {
+													"type": "string",
+													"nullable": true,
+													"example": "65f1c2a4d8b9e0123456789d"
+												},
+												"hasMore": {
+													"type": "boolean",
+													"example": true
+												}
+											},
+											"required": ["pinned", "incidents", "total", "nextCursor", "hasMore"]
+										}
+									},
+									"required": ["success", "msg", "data"]
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Status page is unpublished and the caller is not on its team",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Status page not found",
 						"content": {
 							"application/json": {
 								"schema": {

@@ -3,6 +3,7 @@ import { IInviteService, InviteService } from "@/domain/invites/invite.service.j
 import { IMaintenanceWindowService, MaintenanceWindowService } from "@/domain/maintenance-windows/maintenance-window.service.js";
 import { IMonitorService, MonitorService } from "@/domain/monitors/monitor.service.js";
 import { IStatusPageService, StatusPageService } from "@/domain/status-pages/status-page.service.js";
+import { IStatusPageIncidentService, StatusPageIncidentService } from "@/domain/status-page-incidents/status-page-incident.service.js";
 import { ITagsService, TagsService } from "@/domain/tags/tag.service.js";
 import { IUserService, UserService } from "@/domain/users/user.service.js";
 import { IJobScheduler } from "@/worker/worker.interface.js";
@@ -30,6 +31,7 @@ export interface ApiServices extends SharedServices {
 	maintenanceWindowService: IMaintenanceWindowService;
 	inviteService: IInviteService;
 	statusPageService: IStatusPageService;
+	statusPageIncidentService: IStatusPageIncidentService;
 	tagsService: ITagsService;
 	diagnosticService: IDiagnosticService;
 	proxiesService: IProxiesService;
@@ -61,6 +63,7 @@ export const buildApi = (shared: SharedServices, jobScheduler: IJobScheduler): A
 		incidentsRepository,
 		teamsRepository,
 		maintenanceWindowsRepository,
+		statusPageIncidentsRepository,
 		jobsRepository,
 		proxiesRepository,
 		queueWorkersRepository,
@@ -114,7 +117,15 @@ export const buildApi = (shared: SharedServices, jobScheduler: IJobScheduler): A
 		emailService,
 	});
 
-	const statusPageService = new StatusPageService(statusPagesRepository, settingsService, monitorsRepository, checksRepository, incidentsRepository);
+	const statusPageService = new StatusPageService(
+		statusPagesRepository,
+		settingsService,
+		monitorsRepository,
+		checksRepository,
+		incidentsRepository,
+		statusPageIncidentsRepository
+	);
+	const statusPageIncidentService = new StatusPageIncidentService({ statusPageIncidentsRepository, statusPagesRepository });
 	const tagsService = new TagsService(tagsRepository, monitorsRepository);
 	const diagnosticService = new DiagnosticService(db);
 	const proxiesService = new ProxiesService(proxiesRepository, monitorsRepository, settingsService);
@@ -153,6 +164,7 @@ export const buildApi = (shared: SharedServices, jobScheduler: IJobScheduler): A
 		maintenanceWindowService,
 		inviteService,
 		statusPageService,
+		statusPageIncidentService,
 		tagsService,
 		diagnosticService,
 		proxiesService,

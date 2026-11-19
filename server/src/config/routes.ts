@@ -21,6 +21,7 @@ import { proxyRoutes } from "@/api/routes/proxyRoutes.js";
 import { queueRoutes } from "@/api/routes/queueRoutes.js";
 import { settingsRoutes } from "@/api/routes/settingsRoutes.js";
 import { statusPageRoutes } from "@/api/routes/statusPageRoutes.js";
+import { statusPageIncidentRoutes } from "@/api/routes/statusPageIncidentRoutes.js";
 import { logRoutes } from "@/api/routes/logRoutes.js";
 import { egressRoutes } from "@/api/routes/egressRoutes.js";
 import { heartbeatRoutes } from "@/api/routes/heartbeatRoutes.js";
@@ -45,6 +46,7 @@ export const setupRoutes = (app: Application, controllers: InitializedController
 	app.use("/api/v1/queue", buildRouter(queueRoutes, controllers.queueController, middleware));
 	app.use("/api/v1/logs", buildRouter(logRoutes, controllers.logController, middleware));
 	app.use("/api/v1/status-page", buildRouter(statusPageRoutes, controllers.statusPageController, middleware));
+	app.use("/api/v1/status-page-incidents", buildRouter(statusPageIncidentRoutes, controllers.statusPageIncidentController, middleware));
 	app.use("/api/v1/notifications", buildRouter(notificationRoutes, controllers.notificationController, middleware));
 	app.use("/api/v1/tags", buildRouter(tagRoutes, controllers.tagController, middleware));
 	app.use("/api/v1/diagnostic", buildRouter(diagnosticRoutes, controllers.diagnosticController, middleware));

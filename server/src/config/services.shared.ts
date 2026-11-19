@@ -46,6 +46,7 @@ import { IIncidentsRepository } from "@/domain/incidents/incident.repository.int
 import { IInvitesRepository } from "@/domain/invites/invite.repository.interface.js";
 import { IJobsRepository } from "@/domain/jobs/job.repository.interface.js";
 import { IMaintenanceWindowsRepository } from "@/domain/maintenance-windows/maintenance-window.repository.interface.js";
+import { IStatusPageIncidentsRepository } from "@/domain/status-page-incidents/status-page-incident.repository.interface.js";
 import { IMonitorStatsRepository } from "@/domain/monitor-stats/monitor-stats.repository.interface.js";
 import { IMonitorsRepository } from "@/domain/monitors/monitor.repository.interface.js";
 import { INotificationsRepository } from "@/domain/notifications/notification.repository.interface.js";
@@ -67,6 +68,7 @@ import MongoIncidentsRepository from "@/domain/incidents/incident.repository.mon
 import MongoInvitesRepository from "@/domain/invites/invite.repository.mongo.js";
 import MongoJobsRepository from "@/domain/jobs/job.repository.mongo.js";
 import MongoMaintenanceWindowsRepository from "@/domain/maintenance-windows/maintenance-window.repository.mongo.js";
+import MongoStatusPageIncidentsRepository from "@/domain/status-page-incidents/status-page-incident.repository.mongo.js";
 import MongoMonitorStatsRepository from "@/domain/monitor-stats/monitor-stats.repository.mongo.js";
 import MongoMonitorsRepository from "@/domain/monitors/monitor.repository.mongo.js";
 import MongoNotificationsRepository from "@/domain/notifications/notification.repository.mongo.js";
@@ -115,6 +117,7 @@ export interface SharedServices {
 	incidentsRepository: IIncidentsRepository;
 	teamsRepository: ITeamsRepository;
 	maintenanceWindowsRepository: IMaintenanceWindowsRepository;
+	statusPageIncidentsRepository: IStatusPageIncidentsRepository;
 	proxiesRepository: IProxiesRepository;
 	connectRepository: IConnectRepository;
 }
@@ -159,6 +162,7 @@ export const buildShared = async ({
 	const tagsRepository = new MongoTagsRepository();
 	const teamsRepository = new MongoTeamsRepository();
 	const maintenanceWindowsRepository = new MongoMaintenanceWindowsRepository();
+	const statusPageIncidentsRepository = new MongoStatusPageIncidentsRepository();
 	const proxiesRepository = new MongoProxiesRepository();
 	const connectRepository = new MongoConnectRepository();
 
@@ -249,6 +253,7 @@ export const buildShared = async ({
 		incidentsRepository,
 		teamsRepository,
 		maintenanceWindowsRepository,
+		statusPageIncidentsRepository,
 		proxiesRepository,
 		connectRepository,
 	};

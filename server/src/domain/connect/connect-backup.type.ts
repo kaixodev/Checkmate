@@ -47,6 +47,7 @@ export const ConnectBackupCollections = [
 	"maintenancewindows",
 	"notifications",
 	"statuspages",
+	"statuspageincidents",
 	"proxies",
 	"tags",
 	"migrations",

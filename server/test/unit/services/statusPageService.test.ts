@@ -5,6 +5,7 @@ import type { ISettingsService } from "../../../src/domain/app-settings/app-sett
 import type { IMonitorsRepository } from "../../../src/domain/monitors/monitor.repository.interface.ts";
 import type { IChecksRepository } from "../../../src/domain/checks/check.repository.interface.ts";
 import type { IIncidentsRepository } from "../../../src/domain/incidents/incident.repository.interface.ts";
+import type { IStatusPageIncidentsRepository } from "../../../src/domain/status-page-incidents/status-page-incident.repository.interface.ts";
 import type { CheckSnapshot } from "../../../src/domain/checks/check.type.ts";
 import type { Monitor } from "../../../src/domain/monitors/monitor.type.ts";
 import type { StatusPage } from "../../../src/domain/status-pages/status-page.type.ts";
@@ -91,14 +92,20 @@ const createIncidentsRepo = () =>
 		findByMonitorIdAndDate: jest.fn().mockResolvedValue([]),
 	}) as unknown as jest.Mocked<IIncidentsRepository>;
 
+const createStatusPageIncidentsRepo = () =>
+	({
+		deleteByStatusPageId: jest.fn().mockResolvedValue(0),
+	}) as unknown as jest.Mocked<IStatusPageIncidentsRepository>;
+
 const createService = (themesEnabled = true, clientHost = "http://localhost:5173", showURL = false) => {
 	const repo = createRepo();
 	const settingsService = createSettingsService(themesEnabled, clientHost, showURL);
 	const monitorsRepo = createMonitorsRepo();
 	const checksRepo = createChecksRepo();
 	const incidentsRepo = createIncidentsRepo();
-	const service = new StatusPageService(repo, settingsService, monitorsRepo, checksRepo, incidentsRepo);
-	return { service, repo, settingsService, monitorsRepo, checksRepo, incidentsRepo };
+	const statusPageIncidentsRepo = createStatusPageIncidentsRepo();
+	const service = new StatusPageService(repo, settingsService, monitorsRepo, checksRepo, incidentsRepo, statusPageIncidentsRepo);
+	return { service, repo, settingsService, monitorsRepo, checksRepo, incidentsRepo, statusPageIncidentsRepo };
 };
 
 // ── Tests ────────────────────────────────────────────────────────────────────
@@ -496,6 +503,22 @@ describe("StatusPageService", () => {
 
 			expect(repo.deleteById).toHaveBeenCalledWith("sp-1", "team-1");
 			expect(result).toEqual(makeStatusPage());
+		});
+
+		it("deletes the incidents posted on the page", async () => {
+			const { service, statusPageIncidentsRepo } = createService(true);
+
+			await service.deleteStatusPage("sp-1", "team-1");
+
+			expect(statusPageIncidentsRepo.deleteByStatusPageId).toHaveBeenCalledWith("sp-1", "team-1");
+		});
+
+		it("keeps the incidents when the page is not found", async () => {
+			const { service, repo, statusPageIncidentsRepo } = createService(true);
+			repo.deleteById.mockRejectedValue(new Error("Status page not found"));
+
+			await expect(service.deleteStatusPage("sp-1", "team-1")).rejects.toThrow("Status page not found");
+			expect(statusPageIncidentsRepo.deleteByStatusPageId).not.toHaveBeenCalled();
 		});
 	});
 });

@@ -87,6 +87,14 @@ class MongoStatusPagesRepository implements IStatusPagesRepository {
 		return this.toEntity(statusPage);
 	};
 
+	findById = async (id: string, teamId: string): Promise<StatusPage> => {
+		const statusPage = await StatusPageModel.findOne({ _id: id, teamId });
+		if (!statusPage) {
+			throw new AppError(statusPageErrors.notFound, { service: SERVICE_NAME });
+		}
+		return this.toEntity(statusPage);
+	};
+
 	findByUrl = async (url: string): Promise<StatusPage> => {
 		const statusPage = await StatusPageModel.findOne({
 			url,

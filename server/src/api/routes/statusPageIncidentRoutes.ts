@@ -1,0 +1,96 @@
+import { IStatusPageIncidentController } from "@/api/controllers/statusPageIncidentController.js";
+import { RouteTable } from "@/api/routes/defineRoutes.js";
+import {
+	createStatusPageIncidentBodyValidation,
+	editStatusPageIncidentBodyValidation,
+	publicStatusPageIncidentHistoryResponseSchema,
+	publicStatusPageIncidentParamValidation,
+	statusPageIncidentCursorQueryValidation,
+	statusPageIncidentIdParamValidation,
+	statusPageIncidentPageResponseSchema,
+	statusPageIncidentStatusPageIdParamValidation,
+	unpinStatusPageIncidentsResponseSchema,
+} from "@/api/validation/statusPageIncidentValidation.js";
+import { statusPageIncidentSchema } from "@/domain/status-page-incidents/status-page-incident.schema.js";
+import { statusPageIncidentErrors } from "@/domain/status-page-incidents/status-page-incident.errors.js";
+import { statusPageErrors } from "@/domain/status-pages/status-page.errors.js";
+
+export const statusPageIncidentRoutes: RouteTable<IStatusPageIncidentController> = {
+	prefix: "/status-page-incidents",
+	tag: "status-page-incident",
+	auth: "jwt",
+	routes: [
+		{
+			method: "get",
+			path: "/status-page/:statusPageId",
+			handler: "getIncidents",
+			summary: "List incidents posted on a status page, newest first",
+			errors: [statusPageErrors.notFound],
+			params: statusPageIncidentStatusPageIdParamValidation,
+			query: statusPageIncidentCursorQueryValidation,
+			response: statusPageIncidentPageResponseSchema,
+		},
+		{
+			method: "post",
+			path: "/status-page/:statusPageId",
+			handler: "createIncident",
+			summary: "Post an incident on a status page; it is pinned as the page's banner (admin/superadmin)",
+			errors: [statusPageErrors.notFound],
+			roles: ["admin", "superadmin"],
+			params: statusPageIncidentStatusPageIdParamValidation,
+			body: createStatusPageIncidentBodyValidation,
+			response: statusPageIncidentSchema,
+		},
+		{
+			method: "post",
+			path: "/status-page/:statusPageId/unpin",
+			handler: "unpinIncidents",
+			summary: "Remove the banner from a status page without resolving its incidents (admin/superadmin)",
+			errors: [statusPageErrors.notFound],
+			roles: ["admin", "superadmin"],
+			params: statusPageIncidentStatusPageIdParamValidation,
+			response: unpinStatusPageIncidentsResponseSchema,
+		},
+		{
+			method: "patch",
+			path: "/:id",
+			handler: "editIncident",
+			summary: "Edit a status page incident (admin/superadmin)",
+			errors: [statusPageIncidentErrors.notFound],
+			roles: ["admin", "superadmin"],
+			params: statusPageIncidentIdParamValidation,
+			body: editStatusPageIncidentBodyValidation,
+			response: statusPageIncidentSchema,
+		},
+		{
+			method: "post",
+			path: "/:id/resolve",
+			handler: "resolveIncident",
+			summary: "Resolve a status page incident and unpin it (admin/superadmin)",
+			errors: [statusPageIncidentErrors.notFound],
+			roles: ["admin", "superadmin"],
+			params: statusPageIncidentIdParamValidation,
+			response: statusPageIncidentSchema,
+		},
+		{
+			method: "delete",
+			path: "/:id",
+			handler: "deleteIncident",
+			summary: "Delete a status page incident (admin/superadmin)",
+			errors: [statusPageIncidentErrors.notFound],
+			roles: ["admin", "superadmin"],
+			params: statusPageIncidentIdParamValidation,
+		},
+		{
+			method: "get",
+			path: "/public/:url",
+			handler: "getPublicIncidentHistory",
+			summary: "Get the pinned incident and incident history of a public status page",
+			errors: [statusPageErrors.unpublished, statusPageErrors.notFound],
+			auth: "statusPage",
+			params: publicStatusPageIncidentParamValidation,
+			query: statusPageIncidentCursorQueryValidation,
+			response: publicStatusPageIncidentHistoryResponseSchema,
+		},
+	],
+};
