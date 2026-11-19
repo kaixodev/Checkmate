@@ -2212,6 +2212,48 @@
 			},
 			"preview": {
 				"title": "Status page preview"
+			},
+			"incidents": {
+				"pastIncidents": "Past incidents",
+				"postedAt": "Posted {{date}}",
+				"updatedAt": "updated {{date}}",
+				"resolved": "Resolved",
+				"loadMore": "Load more",
+				"loading": "Loading…",
+				"styles": {
+					"info": "Info",
+					"warning": "Warning",
+					"danger": "Danger",
+					"primary": "Primary",
+					"light": "Light",
+					"dark": "Dark"
+				},
+				"manage": {
+					"open": "Post incident",
+					"title": "Status page incidents",
+					"description": "Posts appear on the public page. A new post is pinned as the banner until you resolve or unpin it.",
+					"createTitle": "Post an incident",
+					"editTitle": "Edit incident",
+					"post": "Post",
+					"listTitle": "Posted incidents ({{count}})",
+					"empty": "No incidents posted yet.",
+					"pinned": "Pinned",
+					"active": "Active",
+					"resolve": "Resolve",
+					"edit": "Edit",
+					"unpin": "Unpin banner",
+					"confirmDelete": "Click again to delete",
+					"fields": {
+						"title": "Title",
+						"content": "Content",
+						"contentHelp": "Markdown is supported.",
+						"style": "Style"
+					},
+					"errors": {
+						"title": "Enter a title.",
+						"content": "Enter the incident text."
+					}
+				}
 			}
 		},
 		"uptime": {

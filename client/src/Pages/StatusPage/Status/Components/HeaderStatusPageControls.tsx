@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { Icon } from "@/Components/design-elements";
 import { Button } from "@/Components/inputs";
-import { Settings, ExternalLink } from "lucide-react";
+import { Settings, ExternalLink, Megaphone } from "lucide-react";
 
 import { useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -16,11 +16,13 @@ interface HeaderStatusPageControlsProps {
 	isAdmin: boolean;
 	statusPage: StatusPage;
 	isPublic?: boolean;
+	onOpenIncidents?: () => void;
 }
 export const HeaderStatusPageControls = ({
 	isAdmin,
 	statusPage,
 	isPublic = false,
+	onOpenIncidents,
 }: HeaderStatusPageControlsProps) => {
 	const theme = useTheme();
 	const navigate = useNavigate();
@@ -75,19 +77,39 @@ export const HeaderStatusPageControls = ({
 				)}
 			</Stack>
 			{isAdmin && !isPublic && (
-				<Button
-					variant="contained"
-					color="secondary"
-					startIcon={
-						<Icon
-							icon={Settings}
-							size={16}
-						/>
-					}
-					onClick={() => navigate(`/status/configure/${statusPage.url}`)}
+				<Stack
+					direction="row"
+					gap={theme.spacing(LAYOUT.XS)}
 				>
-					{t("common.buttons.configure")}
-				</Button>
+					{onOpenIncidents && (
+						<Button
+							variant="contained"
+							color="secondary"
+							startIcon={
+								<Icon
+									icon={Megaphone}
+									size={16}
+								/>
+							}
+							onClick={onOpenIncidents}
+						>
+							{t("pages.statusPages.incidents.manage.open")}
+						</Button>
+					)}
+					<Button
+						variant="contained"
+						color="secondary"
+						startIcon={
+							<Icon
+								icon={Settings}
+								size={16}
+							/>
+						}
+						onClick={() => navigate(`/status/configure/${statusPage.url}`)}
+					>
+						{t("common.buttons.configure")}
+					</Button>
+				</Stack>
 			)}
 		</Stack>
 	);

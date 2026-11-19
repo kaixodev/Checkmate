@@ -27,6 +27,8 @@ import {
 } from "@/Utils/statusPageUrl";
 import { cssReferencesExternalResource } from "@/Utils/customCss";
 import { HeaderStatusPageControls } from "@/Pages/StatusPage/Status/Components/HeaderStatusPageControls";
+import { StatusPageIncidentsDialog } from "@/Pages/StatusPage/Status/Components/StatusPageIncidentsDialog";
+import { useState } from "react";
 import { StatusPageThemeProvider } from "@/Pages/StatusPage/Status/themes/StatusPageThemeProvider";
 import {
 	BaseStatusPage,
@@ -85,6 +87,9 @@ const StatusPageView = () => {
 	const isAdmin = useIsAdmin();
 	const location = useLocation();
 	const [searchParams, setSearchParams] = useSearchParams();
+	const [incidentsOpen, setIncidentsOpen] = useState(false);
+	// Bumped after an incident change so the preview iframe reloads right away
+	const [previewKey, setPreviewKey] = useState(0);
 
 	const onRangeChange = (next: StatusPageRange) => {
 		const updated = new URLSearchParams(searchParams);
@@ -192,7 +197,16 @@ const StatusPageView = () => {
 				isAdmin={isAdmin}
 				statusPage={statusPage}
 				isPublic={false}
+				onOpenIncidents={() => setIncidentsOpen(true)}
 			/>
+			{isAdmin && (
+				<StatusPageIncidentsDialog
+					open={incidentsOpen}
+					statusPage={statusPage}
+					onClose={() => setIncidentsOpen(false)}
+					onChanged={() => setPreviewKey((key) => key + 1)}
+				/>
+			)}
 			<StatusPageThemeProvider
 				theme={statusPage.theme}
 				themeMode={statusPage.themeMode}
@@ -202,6 +216,7 @@ const StatusPageView = () => {
 				<BrowserFrame url={publicUrl}>
 					<Box
 						component="iframe"
+						key={previewKey}
 						src={previewUrl}
 						title={t("pages.statusPages.preview.title")}
 						flex={1}

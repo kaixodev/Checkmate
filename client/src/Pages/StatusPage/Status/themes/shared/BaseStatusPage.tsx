@@ -16,6 +16,11 @@ import { ThemedHeatmap } from "@/Pages/StatusPage/Status/themes/shared/ThemedHea
 import { ThemedHistogram } from "@/Pages/StatusPage/Status/themes/shared/ThemedHistogram";
 import { IncidentModal } from "@/Pages/StatusPage/Status/themes/shared/IncidentModal";
 import {
+	ThemedIncidentBanner,
+	ThemedIncidentHistory,
+} from "@/Pages/StatusPage/Status/themes/shared/ThemedStatusPageIncidents";
+import { usePublicStatusPageIncidents } from "@/Hooks/useStatusPageIncidents";
+import {
 	ThemedInfrastructure,
 	type GaugeFillLevel,
 } from "@/Pages/StatusPage/Status/themes/shared/ThemedInfrastructure";
@@ -120,6 +125,13 @@ export const BaseStatusPage = ({
 	const [chartMode, setChartMode] = useState<"heatmap" | "histogram">("heatmap");
 	const [selectedMonitorId, setSelectedMonitorId] = useState<string | null>(null);
 	const [selectedDate, setSelectedDate] = useState<string | null>(null);
+	const {
+		pinned,
+		incidents,
+		hasMore: hasMoreIncidents,
+		isLoadingMore: isLoadingMoreIncidents,
+		loadMore: loadMoreIncidents,
+	} = usePublicStatusPageIncidents(statusPage.url);
 
 	const overall = resolveOverallStatus(monitors, t, config.overallStatusOptions);
 	const logoSrc = statusPage.logo?.data
@@ -154,6 +166,14 @@ export const BaseStatusPage = ({
 				bucketTimezone={bucketTimezone}
 				styles={styles}
 			/>
+
+			{pinned && (
+				<ThemedIncidentBanner
+					incident={pinned}
+					styles={styles}
+					timezone={bucketTimezone}
+				/>
+			)}
 
 			{statusPage.showCharts && (
 				<Stack>
@@ -333,6 +353,16 @@ export const BaseStatusPage = ({
 					);
 				})}
 			</Stack>
+
+			<ThemedIncidentHistory
+				incidents={incidents}
+				pinnedId={pinned?.id ?? null}
+				styles={styles}
+				timezone={bucketTimezone}
+				hasMore={hasMoreIncidents}
+				isLoadingMore={isLoadingMoreIncidents}
+				onLoadMore={loadMoreIncidents}
+			/>
 
 			<Box
 				component="footer"
