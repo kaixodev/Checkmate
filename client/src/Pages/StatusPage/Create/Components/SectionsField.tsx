@@ -12,6 +12,7 @@ import { FormMultiSelectField } from "@/Components/inputs/forms/FormMultiSelectF
 import { FormTextField } from "@/Components/inputs/forms/FormTextField";
 import { MonitorSelectedRow } from "@/Components/monitors/MonitorSelectedRow";
 import type { Monitor } from "@/Types/Monitor";
+import { Icon } from "@/Components/design-elements";
 import { LAYOUT } from "@/Utils/Theme/constants";
 import type { StatusPageFormData } from "@/Validation/statusPage";
 
@@ -79,7 +80,10 @@ export const SectionsField = ({ monitors }: SectionsFieldProps) => {
 							title={t("pages.statusPages.form.sections.remove")}
 							onClick={() => remove(index)}
 						>
-							<Trash2 size={16} />
+							<Icon
+								icon={Trash2}
+								size={16}
+							/>
 						</IconButton>
 					</Stack>
 					<FormMultiSelectField
@@ -95,7 +99,12 @@ export const SectionsField = ({ monitors }: SectionsFieldProps) => {
 			<Stack alignItems="flex-start">
 				<Button
 					variant="outlined"
-					startIcon={<Plus size={16} />}
+					startIcon={
+						<Icon
+							icon={Plus}
+							size={16}
+						/>
+					}
 					onClick={() => append({ name: "", monitors: [] })}
 				>
 					{t("pages.statusPages.form.sections.add")}

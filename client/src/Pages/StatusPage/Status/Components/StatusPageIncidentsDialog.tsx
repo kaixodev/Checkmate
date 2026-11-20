@@ -26,8 +26,9 @@ import {
 } from "@/Types/StatusPageIncident";
 import type { StatusPage } from "@/Types/StatusPage";
 import { formatDate } from "@/Utils/TimeUtils";
+import { Icon } from "@/Components/design-elements";
 import { LAYOUT } from "@/Utils/Theme/constants";
-import { typographyLevels } from "@/Utils/Theme/Palette";
+import { fontWeights, typographyLevels } from "@/Utils/Theme/Palette";
 
 const EMPTY_FORM: StatusPageIncidentFormValues = {
 	title: "",
@@ -243,7 +244,12 @@ export const StatusPageIncidentsDialog = ({
 						{hasPinned && (
 							<Button
 								variant="outlined"
-								startIcon={<PinOff size={16} />}
+								startIcon={
+									<Icon
+										icon={PinOff}
+										size={16}
+									/>
+								}
 								onClick={unpin}
 								disabled={busy}
 							>
@@ -270,7 +276,7 @@ export const StatusPageIncidentsDialog = ({
 						>
 							<Box minWidth={0}>
 								<Typography
-									fontWeight={600}
+									fontWeight={fontWeights.semibold}
 									sx={{ overflowWrap: "anywhere" }}
 								>
 									{incident.title}
@@ -296,7 +302,10 @@ export const StatusPageIncidentsDialog = ({
 										onClick={() => resolve(incident)}
 										disabled={busy}
 									>
-										<Check size={16} />
+										<Icon
+											icon={Check}
+											size={16}
+										/>
 									</IconButton>
 								)}
 								<IconButton
@@ -305,7 +314,10 @@ export const StatusPageIncidentsDialog = ({
 									onClick={() => startEdit(incident)}
 									disabled={busy}
 								>
-									<Pencil size={16} />
+									<Icon
+										icon={Pencil}
+										size={16}
+									/>
 								</IconButton>
 								{armedDeleteId === incident.id ? (
 									<Button
@@ -325,7 +337,10 @@ export const StatusPageIncidentsDialog = ({
 										onClick={() => remove(incident)}
 										disabled={busy}
 									>
-										<Trash2 size={16} />
+										<Icon
+											icon={Trash2}
+											size={16}
+										/>
 									</IconButton>
 								)}
 							</Stack>
