@@ -7,12 +7,13 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@mui/material/styles";
 import { ChevronLeft, HelpCircle, FileText, Code } from "lucide-react";
 import { INPUT_BASE_HEIGHT, LAYOUT, SPACING } from "@/Utils/Theme/constants";
-import { typographyLevels } from "@/Utils/Theme/Palette";
+import { typographyLevels, fontWeights } from "@/Utils/Theme/Palette";
 import { useAppVersion } from "@/Hooks/useAppVersion";
 import { PulseDot } from "@/Components/design-elements/PulseDot";
 import { formatVersion } from "@/Utils/FormatUtils";
 
 import type { ReactNode } from "react";
+import Icon from "./Icon";
 
 const HEADER_LINK_WIDTH = 32;
 
@@ -44,30 +45,15 @@ export const PageHeader = ({
 	const linkItems: { key: keyof typeof EXTERNAL_LINKS; icon: ReactNode }[] = [
 		{
 			key: "support",
-			icon: (
-				<HelpCircle
-					size={16}
-					strokeWidth={1.6}
-				/>
-			),
+			icon: <Icon icon={HelpCircle} />,
 		},
 		{
 			key: "docs",
-			icon: (
-				<FileText
-					size={16}
-					strokeWidth={1.6}
-				/>
-			),
+			icon: <Icon icon={FileText} />,
 		},
 		{
 			key: "changelog",
-			icon: (
-				<Code
-					size={16}
-					strokeWidth={1.6}
-				/>
-			),
+			icon: <Icon icon={Code} />,
 		},
 	];
 
@@ -77,7 +63,6 @@ export const PageHeader = ({
 			alignItems="flex-start"
 			justifyContent="space-between"
 			gap={LAYOUT.SM}
-			mb={theme.spacing(8)}
 		>
 			<Stack gap={theme.spacing(SPACING.SM)}>
 				{backTo && backLabel && (
@@ -88,16 +73,16 @@ export const PageHeader = ({
 						gap={SPACING.XS}
 						color={theme.palette.text.secondary}
 						fontSize={typographyLevels.base}
-						mb={theme.spacing(1)}
+						mb={theme.spacing(SPACING.SM)}
 						alignItems={"center"}
 						sx={{
 							textDecoration: "none",
 							"&:hover": { color: theme.palette.text.primary },
 						}}
 					>
-						<ChevronLeft
+						<Icon
+							icon={ChevronLeft}
 							size={14}
-							strokeWidth={1.5}
 						/>
 						{backLabel}
 					</Box>
@@ -105,7 +90,7 @@ export const PageHeader = ({
 				<Typography
 					component="h1"
 					fontSize={typographyLevels.xxl}
-					fontWeight={500}
+					fontWeight={fontWeights.medium}
 					color={theme.palette.text.primary}
 					lineHeight={1.3}
 					letterSpacing="-0.02em"
@@ -143,8 +128,8 @@ export const PageHeader = ({
 							alignItems="center"
 							height={INPUT_BASE_HEIGHT}
 							gap={theme.spacing(SPACING.SM)}
-							pl={theme.spacing(3)}
-							pr={theme.spacing(5)}
+							pl={theme.spacing(SPACING.XXL)}
+							pr={theme.spacing(LAYOUT.XS_PLUS)}
 							borderRight={`1px solid ${theme.palette.divider}`}
 							color={theme.palette.text.primary}
 							fontSize={typographyLevels.base}

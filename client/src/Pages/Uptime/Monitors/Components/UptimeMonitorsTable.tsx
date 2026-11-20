@@ -8,6 +8,7 @@ import {
 	StatusLabel,
 	ColoredLabel,
 	SignalLabel,
+	Icon,
 } from "@/Components/design-elements";
 import { HeatmapResponseTime, HistogramResponseTime } from "@/Components/common";
 import { ActionsMenu } from "@/Components/actions-menu";
@@ -173,9 +174,9 @@ export const MonitorTable = ({
 			>
 				{isActive ? (
 					sortOrder === "asc" ? (
-						<ArrowUp size={16} />
+						<Icon icon={ArrowUp} />
 					) : (
-						<ArrowDown size={16} />
+						<Icon icon={ArrowDown} />
 					)
 				) : null}
 			</Box>
@@ -239,7 +240,7 @@ export const MonitorTable = ({
 						onClick={(e) => handleSort(e, "status")}
 						sx={{ cursor: "pointer" }}
 					>
-						<Box width={theme.spacing(8)} />
+						<Box width={theme.spacing(LAYOUT.MD)} />
 						{t("common.table.headers.status")}
 						{renderSortIcon(sortField === "status")}
 					</Stack>
@@ -315,7 +316,7 @@ export const MonitorTable = ({
 						onClick={(e) => handleSort(e, "type")}
 						sx={{ cursor: "pointer" }}
 					>
-						<Box width={theme.spacing(8)} />
+						<Box width={theme.spacing(LAYOUT.MD)} />
 						{t("common.table.headers.type")}
 						{renderSortIcon(sortField === "type")}
 					</Stack>

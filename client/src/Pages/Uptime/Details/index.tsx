@@ -1,4 +1,4 @@
-import { BasePage } from "@/Components/design-elements";
+import { BasePage, Icon } from "@/Components/design-elements";
 import { HeaderTimeRange } from "@/Components/common";
 import Stack from "@mui/material/Stack";
 import {
@@ -185,6 +185,7 @@ const UptimeDetailsPage = () => {
 		return null;
 	}
 	const isHeartbeat = monitor.type === "heartbeat";
+	const histogramMetric = isHeartbeat ? "checkCount" : "responseTime";
 
 	const geoChecksForTable = geoChecksTableData?.geoChecks ?? [];
 	const geoChecksCount = geoChecksTableData?.geoChecksCount ?? 0;
@@ -221,15 +222,29 @@ const UptimeDetailsPage = () => {
 			>
 				<HistogramStatus
 					title={t("common.charts.labels.uptime")}
-					icon={<TrendingUp />}
+					icon={
+						<Icon
+							icon={TrendingUp}
+							size={20}
+						/>
+					}
 					checks={monitorData?.groupedUpChecks ?? []}
 					range={dateRange}
+					metric={histogramMetric}
+					countColor="success"
 				/>
 				<HistogramStatus
 					title={t("common.charts.labels.downtime")}
-					icon={<AlertTriangle />}
+					icon={
+						<Icon
+							icon={AlertTriangle}
+							size={20}
+						/>
+					}
 					checks={monitorData?.groupedDownChecks ?? []}
 					range={dateRange}
+					metric={histogramMetric}
+					countColor="error"
 				/>
 				{!isHeartbeat && (
 					<RadialAvgResponse

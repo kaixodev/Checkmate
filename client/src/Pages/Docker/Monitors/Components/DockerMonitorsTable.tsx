@@ -6,6 +6,7 @@ import {
 	Pagination,
 	StatusLabel,
 	ColoredLabel,
+	Icon,
 } from "@/Components/design-elements";
 import { SPACING, LAYOUT } from "@/Utils/Theme/constants";
 import { getNextMonitorSort } from "@/Utils/MonitorUtils";
@@ -171,9 +172,9 @@ export const DockerMonitorsTable = ({
 			>
 				{isActive ? (
 					sortOrder === "asc" ? (
-						<ArrowUp size={16} />
+						<Icon icon={ArrowUp} />
 					) : (
-						<ArrowDown size={16} />
+						<Icon icon={ArrowDown} />
 					)
 				) : null}
 			</Box>
@@ -247,7 +248,7 @@ export const DockerMonitorsTable = ({
 						onClick={(e) => handleSort(e, "status")}
 						sx={{ cursor: "pointer" }}
 					>
-						<Box width={theme.spacing(8)} />
+						<Box width={theme.spacing(LAYOUT.MD)} />
 						{t("common.table.headers.status")}
 						{renderSortIcon(sortField === "status")}
 					</Stack>

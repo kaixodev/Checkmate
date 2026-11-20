@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import type { SxProps } from "@mui/material";
 
 import { useTheme } from "@mui/material/styles";
+import { LAYOUT } from "@/Utils/Theme/constants";
+import { typographyLevels, fontWeights } from "@/Utils/Theme/Palette";
 
 type StatusBoxProps = React.PropsWithChildren<{
 	children: React.ReactNode;
@@ -18,7 +20,7 @@ export const BGBox = ({ children, sx }: StatusBoxProps) => {
 			sx={{
 				backgroundColor: theme.palette.background.paper,
 				flex: 1,
-				padding: theme.spacing(6),
+				padding: theme.spacing(LAYOUT.SM),
 				...sx,
 			}}
 		>
@@ -41,13 +43,13 @@ const StatusBox = ({
 	const theme = useTheme();
 	return (
 		<BGBox sx={sx}>
-			<Stack spacing={theme.spacing(4)}>
+			<Stack spacing={theme.spacing(LAYOUT.XS)}>
 				<Typography
 					textTransform="uppercase"
 					color={theme.palette.text.secondary}
 					sx={{
-						fontSize: 11,
-						fontWeight: 500,
+						fontSize: typographyLevels.s,
+						fontWeight: fontWeights.medium,
 						letterSpacing: "0.08em",
 					}}
 				>

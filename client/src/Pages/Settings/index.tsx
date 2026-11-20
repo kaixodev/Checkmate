@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { Autocomplete, Select, Dialog, MenuItem } from "@/Components/inputs";
 import { logger } from "@/Utils/logger";
-import { LAYOUT } from "@/Utils/Theme/constants";
+import { LAYOUT, SPACING } from "@/Utils/Theme/constants";
 import { Stack, useTheme, Link, Alert, type SelectChangeEvent } from "@mui/material";
 import { useEffect, useMemo } from "react";
 import { FormProvider, useForm, type FieldPath } from "react-hook-form";
@@ -29,6 +29,7 @@ import { useSelector, useDispatch } from "react-redux";
 import DummyChart from "@/Pages/Settings/DummyChart";
 import { HeartbeatKeyBox } from "@/Pages/Settings/components/HeartbeatKeyBox";
 import { ConnectSettings } from "@/Pages/Settings/components/Connect/ConnectSettings";
+import { CONNECT_SITE_URL } from "@/Pages/Settings/components/Connect/constants";
 import { TagsSettings } from "@/Pages/Settings/components/Tags/TagsSettings";
 import { ProxiesSettings } from "@/Pages/Settings/components/Proxies/ProxiesSettings";
 import { useGet, usePatch, usePost, useLazyGet } from "@/Hooks/UseApi";
@@ -71,6 +72,7 @@ import {
 	toCanonicalTimezone,
 	type TimeFormat,
 } from "@/Utils/TimeUtils";
+import { fontWeights } from "@/Utils/Theme/Palette";
 
 const SETTINGS_TABS = [
 	{
@@ -472,7 +474,7 @@ export const SettingsPage = () => {
 			await importMonitors("/monitors/import/json", { monitors });
 
 			event.target.value = "";
-		} catch (error) {
+		} catch {
 			toastError("Error parsing JSON file. Please check the file format.");
 			event.target.value = "";
 		}
@@ -685,7 +687,7 @@ export const SettingsPage = () => {
 									title={t("pages.settings.form.about.title")}
 									subtitle=""
 									rightContent={
-										<Stack spacing={2}>
+										<Stack spacing={theme.spacing(LAYOUT.XXS)}>
 											<Typography variant="body1">
 												{t("common.appName")} {__APP_VERSION__}
 											</Typography>
@@ -724,7 +726,7 @@ export const SettingsPage = () => {
 										title={t("pages.settings.form.thresholds.title")}
 										subtitle={t("pages.settings.form.thresholds.description")}
 										rightContent={
-											<Stack spacing={2}>
+											<Stack spacing={theme.spacing(LAYOUT.MD)}>
 												<FormSliderField
 													name="globalThresholds.cpu"
 													fieldLabel={t(
@@ -1153,7 +1155,7 @@ export const SettingsPage = () => {
 										rightContent={
 											<Stack gap={theme.spacing(LAYOUT.MD)}>
 												<Stack
-													gap={theme.spacing(LAYOUT.MD)}
+													gap={theme.spacing(LAYOUT.XS)}
 													direction={"row"}
 												>
 													<input
@@ -1194,7 +1196,7 @@ export const SettingsPage = () => {
 														{t("pages.settings.form.importExportMonitors.connectTabLink")}
 													</Link>
 													<Link
-														href="https://checkmateconnect.io"
+														href={CONNECT_SITE_URL}
 														target="_blank"
 														rel="noopener noreferrer"
 													>
@@ -1294,13 +1296,16 @@ export const SettingsPage = () => {
 								<Alert severity="error">
 									<Typography
 										variant="body2"
-										sx={{ fontWeight: 600, mb: 1 }}
+										sx={{
+											fontWeight: fontWeights.semibold,
+											mb: theme.spacing(SPACING.SM),
+										}}
 									>
 										{t("pages.settings.form.validation.errorMessage")}
 									</Typography>
 									<Box
 										component="ul"
-										sx={{ m: 0, pl: 2 }}
+										sx={{ m: 0, pl: theme.spacing(LAYOUT.XXS) }}
 									>
 										{flattenFieldErrors(form.formState.errors).map(
 											({ path, message }) => {

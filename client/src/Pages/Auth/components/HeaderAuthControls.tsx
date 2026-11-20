@@ -25,7 +25,7 @@ export const HeaderAuthControls = ({
 			direction="row"
 			alignItems="center"
 			justifyContent="space-between"
-			px={theme.spacing(12)}
+			px={theme.spacing(LAYOUT.XL)}
 			gap={theme.spacing(LAYOUT.XS)}
 			{...stackProps}
 		>
@@ -43,7 +43,7 @@ export const HeaderAuthControls = ({
 			</Stack>
 			<Stack
 				direction="row"
-				spacing={theme.spacing(2)}
+				spacing={theme.spacing(LAYOUT.XS)}
 				alignItems="center"
 			>
 				<LanguageSelector />

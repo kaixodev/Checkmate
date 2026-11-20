@@ -8,6 +8,7 @@ import { ChevronDown } from "lucide-react";
 import { LAYOUT, SPACING } from "@/Utils/Theme/constants";
 import { shadow } from "@/Utils/Theme/Theme";
 import { useTranslation } from "react-i18next";
+import Icon from "@/Components/design-elements/Icon";
 
 type AutoCompleteInputProps = Omit<
 	AutocompleteProps<any, boolean, boolean, boolean>,
@@ -50,10 +51,10 @@ export const AutoCompleteInput = ({
 			{...autocompleteProps}
 			disableCloseOnSelect={!!multiple}
 			popupIcon={
-				<ChevronDown
+				<Icon
+					icon={ChevronDown}
 					size={18}
-					strokeWidth={1.5}
-					style={{ marginRight: theme.spacing(3) }}
+					style={{ marginRight: theme.spacing(SPACING.XXL) }}
 				/>
 			}
 			renderInput={renderInput || defaultRenderInput}
@@ -94,10 +95,10 @@ export const AutoCompleteInput = ({
 			}
 			sx={{
 				"&.MuiAutocomplete-root .MuiAutocomplete-input": {
-					padding: `0 ${theme.spacing(5)}`,
+					padding: `0 ${theme.spacing(LAYOUT.XS_PLUS)}`,
 				},
 				"& .MuiInputBase-root .MuiAutocomplete-endAdornment": {
-					right: theme.spacing(3),
+					right: theme.spacing(SPACING.XXL),
 				},
 			}}
 		/>
@@ -105,7 +106,7 @@ export const AutoCompleteInput = ({
 
 	if (fieldLabel) {
 		return (
-			<Stack spacing={theme.spacing(2)}>
+			<Stack spacing={theme.spacing(LAYOUT.XXS)}>
 				<FieldLabel required={required}>{fieldLabel}</FieldLabel>
 				{autocomplete}
 			</Stack>

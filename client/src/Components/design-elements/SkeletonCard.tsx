@@ -40,7 +40,7 @@ export const SkeletonCard = ({
 		display: "flex",
 		gap: theme.spacing(LAYOUT.XS_PLUS),
 		alignItems: "center",
-		padding: theme.spacing(5),
+		padding: theme.spacing(LAYOUT.SM),
 	};
 
 	const blockStyle = {
@@ -65,8 +65,8 @@ export const SkeletonCard = ({
 	return (
 		<Box
 			position={"relative"}
-			mt={20}
-			mb={20}
+			mt={theme.spacing(LAYOUT.XXL)}
+			mb={theme.spacing(LAYOUT.XXL)}
 		>
 			{showHalo && (
 				<Box

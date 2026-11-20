@@ -2,6 +2,7 @@ import { type DateFormat } from "@/Utils/TimeUtils";
 import { Text } from "recharts";
 import { useTheme } from "@mui/material";
 import { useFormatDate } from "@/Hooks/useFormatDate";
+import { typographyLevels, fontWeights } from "@/Utils/Theme/Palette";
 
 const TICK_FORMATS: Record<string, DateFormat> = {
 	recent: "time",
@@ -26,8 +27,8 @@ export const XTick = ({ x, y, payload, range }: XTickProps) => {
 			y={y + 10}
 			textAnchor="middle"
 			fill={theme.palette.neutral.tertiary}
-			fontSize={11}
-			fontWeight={400}
+			fontSize={typographyLevels.s}
+			fontWeight={fontWeights.regular}
 		>
 			{formatDate(payload?.value, TICK_FORMATS[range] ?? "dateTimeShort")}
 		</Text>

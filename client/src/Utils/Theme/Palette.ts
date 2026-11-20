@@ -15,6 +15,12 @@ export const typographyLevels = {
 	xxxl: `${(typographyBase + 11) / 16}rem`,
 };
 
+export const fontWeights = {
+	regular: 400,
+	medium: 500,
+	semibold: 600,
+} as const;
+
 export const colors = {
 	teal600: "#008B91",
 	brandGreenDark: "#075443",
@@ -256,8 +262,8 @@ export const lightPalette = {
 			mark: colors.blue200,
 		},
 	},
+	accent: colors.brandGreen,
 	sidebar: {
-		accent: colors.brandGreen,
 		groups: lightGroups,
 	},
 	scrollbar: {
@@ -357,8 +363,8 @@ export const darkPalette = {
 			mark: colors.blue300,
 		},
 	},
+	accent: colors.brandGreenLight,
 	sidebar: {
-		accent: colors.brandGreenLight,
 		groups: darkGroups,
 	},
 	scrollbar: {

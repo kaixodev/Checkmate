@@ -28,11 +28,12 @@ import { useTranslation } from "react-i18next";
 import { useState, Fragment, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import { SPACING, LAYOUT } from "@/Utils/Theme/constants";
-import { typographyLevels } from "@/Utils/Theme/Palette";
+import { typographyLevels, fontWeights } from "@/Utils/Theme/Palette";
 import type { SxProps, Theme } from "@mui/material/styles";
 import type { SortOrder } from "@/Types/Query";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { IconButton } from "@/Components/inputs";
+import Icon from "./Icon";
 
 const TABLE_HEAD_HEIGHT = 36;
 const CHECKBOX_PADDING = 9;
@@ -234,7 +235,7 @@ export function DataTable<
 					"& :is(th)": {
 						backgroundColor: theme.palette.neutral.raised,
 						color: theme.palette.neutral.tertiary,
-						fontWeight: 500,
+						fontWeight: fontWeights.medium,
 						textTransform: "uppercase",
 						letterSpacing: "0.07em",
 						py: LAYOUT.XS,
@@ -345,15 +346,9 @@ export function DataTable<
 													}}
 												>
 													{theme.direction === "rtl" ? (
-														<ChevronLeft
-															size={16}
-															strokeWidth={1.5}
-														/>
+														<Icon icon={ChevronLeft} />
 													) : (
-														<ChevronRight
-															size={16}
-															strokeWidth={1.5}
-														/>
+														<Icon icon={ChevronRight} />
 													)}
 												</Box>
 											)}
@@ -389,7 +384,14 @@ export function DataTable<
 												timeout="auto"
 												unmountOnExit
 											>
-												<Box sx={{ pt: 4, pb: 4 }}>{expandedContent}</Box>
+												<Box
+													sx={{
+														pt: theme.spacing(LAYOUT.XS),
+														pb: theme.spacing(LAYOUT.XS),
+													}}
+												>
+													{expandedContent}
+												</Box>
 											</Collapse>
 										</TableCell>
 									</TableRow>
@@ -438,7 +440,7 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 
 	return (
 		<Box
-			sx={{ flexShrink: 0, ml: { xs: 0, md: 2.5 } }}
+			sx={{ flexShrink: 0, ml: { xs: 0, md: theme.spacing(SPACING.XL) } }}
 			className="table-pagination-actions"
 		>
 			<IconButton
@@ -448,14 +450,14 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 				sx={controlHoverSx(theme)}
 			>
 				{theme.direction === "rtl" ? (
-					<ChevronsRight
+					<Icon
+						icon={ChevronsRight}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				) : (
-					<ChevronsLeft
+					<Icon
+						icon={ChevronsLeft}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				)}
 			</IconButton>
@@ -466,14 +468,14 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 				sx={controlHoverSx(theme)}
 			>
 				{theme.direction === "rtl" ? (
-					<ChevronRight
+					<Icon
+						icon={ChevronRight}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				) : (
-					<ChevronLeft
+					<Icon
+						icon={ChevronLeft}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				)}
 			</IconButton>
@@ -484,14 +486,14 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 				sx={controlHoverSx(theme)}
 			>
 				{theme.direction === "rtl" ? (
-					<ChevronLeft
+					<Icon
+						icon={ChevronLeft}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				) : (
-					<ChevronRight
+					<Icon
+						icon={ChevronRight}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				)}
 			</IconButton>
@@ -502,14 +504,14 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 				sx={controlHoverSx(theme)}
 			>
 				{theme.direction === "rtl" ? (
-					<ChevronsLeft
+					<Icon
+						icon={ChevronsLeft}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				) : (
-					<ChevronsRight
+					<Icon
+						icon={ChevronsRight}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				)}
 			</IconButton>
@@ -540,7 +542,7 @@ function HasMoreTablePaginationActions(props: HasMoreTablePaginationActionsProps
 
 	return (
 		<Box
-			sx={{ flexShrink: 0, ml: { xs: 0, md: 2.5 } }}
+			sx={{ flexShrink: 0, ml: { xs: 0, md: theme.spacing(SPACING.XL) } }}
 			className="table-pagination-actions"
 		>
 			<IconButton
@@ -550,14 +552,14 @@ function HasMoreTablePaginationActions(props: HasMoreTablePaginationActionsProps
 				sx={controlHoverSx(theme)}
 			>
 				{theme.direction === "rtl" ? (
-					<ChevronsRight
+					<Icon
+						icon={ChevronsRight}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				) : (
-					<ChevronsLeft
+					<Icon
+						icon={ChevronsLeft}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				)}
 			</IconButton>
@@ -568,14 +570,14 @@ function HasMoreTablePaginationActions(props: HasMoreTablePaginationActionsProps
 				sx={controlHoverSx(theme)}
 			>
 				{theme.direction === "rtl" ? (
-					<ChevronRight
+					<Icon
+						icon={ChevronRight}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				) : (
-					<ChevronLeft
+					<Icon
+						icon={ChevronLeft}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				)}
 			</IconButton>
@@ -586,14 +588,14 @@ function HasMoreTablePaginationActions(props: HasMoreTablePaginationActionsProps
 				sx={controlHoverSx(theme)}
 			>
 				{theme.direction === "rtl" ? (
-					<ChevronLeft
+					<Icon
+						icon={ChevronLeft}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				) : (
-					<ChevronRight
+					<Icon
+						icon={ChevronRight}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				)}
 			</IconButton>
@@ -603,9 +605,9 @@ function HasMoreTablePaginationActions(props: HasMoreTablePaginationActionsProps
 					aria-label="next page"
 					sx={controlHoverSx(theme)}
 				>
-					<Ellipsis
+					<Icon
+						icon={Ellipsis}
 						size={20}
-						strokeWidth={1.5}
 					/>
 				</IconButton>
 			</Tooltip>

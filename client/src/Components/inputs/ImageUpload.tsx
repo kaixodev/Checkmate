@@ -5,6 +5,8 @@ import { useState, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { IconButton } from "@/Components/inputs";
 import { SPACING } from "@/Utils/Theme/constants";
+import Icon from "@/Components/design-elements/Icon";
+import { fontWeights } from "@/Utils/Theme/Palette";
 
 interface FileObject {
 	src: string;
@@ -90,7 +92,10 @@ export const ImageUpload = ({
 						onClick={handleClear}
 						sx={{ color: theme.palette.error.main }}
 					>
-						<X size={18} />
+						<Icon
+							icon={X}
+							size={18}
+						/>
 					</IconButton>
 				</Stack>
 			) : (
@@ -131,9 +136,9 @@ export const ImageUpload = ({
 						onChange={(e) => handleFile(e.target.files?.[0])}
 						style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer" }}
 					/>
-					<Upload
+					<Icon
+						icon={Upload}
 						size={20}
-						strokeWidth={1.5}
 						color="currentColor"
 						style={{ opacity: 0.7 }}
 					/>
@@ -145,7 +150,7 @@ export const ImageUpload = ({
 							component="span"
 							variant="body2"
 							color="primary"
-							fontWeight={500}
+							fontWeight={fontWeights.medium}
 						>
 							{t("components.imageUpload.clickToUpload")}
 						</Typography>{" "}
@@ -164,7 +169,7 @@ export const ImageUpload = ({
 				<Typography
 					variant="caption"
 					color="error"
-					sx={{ mt: 1 }}
+					sx={{ mt: theme.spacing(SPACING.SM) }}
 				>
 					{displayError}
 				</Typography>

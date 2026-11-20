@@ -4,8 +4,9 @@ import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import { Check, ChevronDown } from "lucide-react";
 import { Menu, MenuItem } from "@/Components/inputs";
-import { typographyLevels } from "@/Utils/Theme/Palette";
+import { typographyLevels, fontWeights } from "@/Utils/Theme/Palette";
 import { INPUT_BASE_HEIGHT, LAYOUT } from "@/Utils/Theme/constants";
+import Icon from "@/Components/design-elements/Icon";
 
 const FILTER_MENU_MIN_WIDTH = 180;
 const MAX_VISIBLE_VALUES = 2;
@@ -105,14 +106,14 @@ export const FilterChip = (props: SingleProps | MultipleProps) => {
 					{label}:{" "}
 					<Box
 						component="span"
-						fontWeight={isSet ? 500 : 400}
+						fontWeight={isSet ? fontWeights.medium : fontWeights.regular}
 					>
 						{valueText}
 					</Box>
 				</Box>
-				<ChevronDown
+				<Icon
+					icon={ChevronDown}
 					size={14}
-					strokeWidth={1.5}
 					color={theme.palette.neutral.icon}
 				/>
 			</ButtonBase>
@@ -141,9 +142,9 @@ export const FilterChip = (props: SingleProps | MultipleProps) => {
 								{option.content ?? option.label}
 							</Box>
 							{isSelected && (
-								<Check
+								<Icon
+									icon={Check}
 									size={14}
-									strokeWidth={1.5}
 									color={theme.palette.primary.main}
 								/>
 							)}

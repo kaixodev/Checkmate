@@ -7,11 +7,12 @@ import {
 	type SignalTone,
 	type SidebarGroupKey,
 	type GroupTone,
+	fontWeights,
 } from "@/Utils/Theme/Palette";
 
 import type { PaletteMode, PaletteOptions, Theme } from "@mui/material/styles";
 import type {} from "@mui/material/styles";
-import { SCROLLBAR_SIZE } from "@/Utils/Theme/constants";
+import { SCROLLBAR_SIZE, LAYOUT } from "@/Utils/Theme/constants";
 
 interface NeutralPalette {
 	raised: string;
@@ -58,7 +59,8 @@ declare module "@mui/material/styles" {
 	interface Palette {
 		neutral: NeutralPalette;
 		signal: Record<SignalKey, SignalTone>;
-		sidebar: { accent: string; groups: Record<SidebarGroupKey, GroupTone> };
+		accent: string;
+		sidebar: { groups: Record<SidebarGroupKey, GroupTone> };
 		scrollbar: { track: string; thumb: string };
 		rowStatus: { running: string; paused: string };
 		chart: ChartPalette;
@@ -66,7 +68,8 @@ declare module "@mui/material/styles" {
 	interface PaletteOptions {
 		neutral?: NeutralPalette;
 		signal?: Record<SignalKey, SignalTone>;
-		sidebar?: { accent: string; groups: Record<SidebarGroupKey, GroupTone> };
+		accent?: string;
+		sidebar?: { groups: Record<SidebarGroupKey, GroupTone> };
 		scrollbar?: { track: string; thumb: string };
 		rowStatus?: { running: string; paused: string };
 		chart?: ChartPalette;
@@ -111,16 +114,28 @@ export const theme = (mode: PaletteMode, palette: PaletteOptions) =>
 			fontSize: typographyLevels.base,
 			h1: {
 				fontSize: typographyLevels.xxxl,
-				fontWeight: 600,
+				fontWeight: fontWeights.semibold,
 				lineHeight: 1.3,
 				letterSpacing: "-0.02em",
 			},
-			h2: { fontSize: typographyLevels.l, fontWeight: 600, lineHeight: 1.4 },
-			body1: { fontSize: typographyLevels.m, fontWeight: 400, lineHeight: 1.5 },
-			body2: { fontSize: typographyLevels.sm, fontWeight: 400, lineHeight: 1.5 },
+			h2: {
+				fontSize: typographyLevels.l,
+				fontWeight: fontWeights.semibold,
+				lineHeight: 1.4,
+			},
+			body1: {
+				fontSize: typographyLevels.m,
+				fontWeight: fontWeights.regular,
+				lineHeight: 1.5,
+			},
+			body2: {
+				fontSize: typographyLevels.sm,
+				fontWeight: fontWeights.regular,
+				lineHeight: 1.5,
+			},
 			eyebrow: {
 				fontSize: typographyLevels.s,
-				fontWeight: 500,
+				fontWeight: fontWeights.medium,
 				textTransform: "uppercase",
 				letterSpacing: "0.07em",
 				lineHeight: 1.4,
@@ -195,7 +210,7 @@ export const theme = (mode: PaletteMode, palette: PaletteOptions) =>
 			MuiInputLabel: {
 				styleOverrides: {
 					root: ({ theme }) => ({
-						top: `-${theme.spacing(4)}`,
+						top: `-${theme.spacing(LAYOUT.XS)}`,
 						"&.MuiInputLabel-shrink": {
 							top: 0,
 						},
@@ -232,10 +247,7 @@ export const theme = (mode: PaletteMode, palette: PaletteOptions) =>
 								borderColor: theme.palette.neutral.borderHover,
 							},
 						"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-							borderColor:
-								theme.palette.mode === "dark"
-									? theme.palette.primary.light
-									: theme.palette.primary.main,
+							borderColor: theme.palette.accent,
 							borderWidth: 2,
 						},
 						"&.Mui-error .MuiOutlinedInput-notchedOutline": {
@@ -250,7 +262,7 @@ export const theme = (mode: PaletteMode, palette: PaletteOptions) =>
 					root: ({ theme }) => {
 						return {
 							...theme.unstable_sx({ borderRadius: theme.shape.borderRadius }),
-							marginTop: 4,
+							marginTop: theme.spacing(LAYOUT.XXS),
 							padding: 0,
 							border: 1,
 							borderStyle: "solid",

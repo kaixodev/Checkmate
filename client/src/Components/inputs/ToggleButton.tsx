@@ -4,16 +4,12 @@ import type { ToggleButtonProps } from "@mui/material/ToggleButton";
 import type { ToggleButtonGroupProps } from "@mui/material/ToggleButtonGroup";
 import { useTheme } from "@mui/material/styles";
 import { INPUT_BASE_HEIGHT, LAYOUT, SPACING } from "@/Utils/Theme/constants";
-import { typographyLevels } from "@/Utils/Theme/Palette";
+import { typographyLevels, fontWeights } from "@/Utils/Theme/Palette";
 
 const SEGMENT_HEIGHT = 22;
 
 export const ToggleButtonInput = ({ sx, ...props }: ToggleButtonProps) => {
 	const theme = useTheme();
-	const selectedText =
-		theme.palette.mode === "dark"
-			? theme.palette.primary.light
-			: theme.palette.primary.main;
 	return (
 		<ToggleButton
 			{...props}
@@ -27,7 +23,7 @@ export const ToggleButtonInput = ({ sx, ...props }: ToggleButtonProps) => {
 				textTransform: "uppercase",
 				letterSpacing: theme.typography.eyebrow.letterSpacing,
 				fontSize: typographyLevels.s,
-				fontWeight: 600,
+				fontWeight: fontWeights.semibold,
 				whiteSpace: "nowrap",
 				boxShadow: "none",
 				color: theme.palette.neutral.subdued,
@@ -39,7 +35,7 @@ export const ToggleButtonInput = ({ sx, ...props }: ToggleButtonProps) => {
 				},
 				"&.Mui-selected, &.Mui-selected:hover": {
 					backgroundColor: theme.palette.neutral.selectedGreen,
-					color: selectedText,
+					color: theme.palette.accent,
 				},
 				"&.Mui-focusVisible": {
 					outline: `2px solid ${theme.palette.primary.main}`,

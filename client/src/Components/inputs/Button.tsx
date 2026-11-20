@@ -2,19 +2,14 @@ import Button from "@mui/material/Button";
 import type { ButtonProps } from "@mui/material/Button";
 import { useTheme, darken } from "@mui/material/styles";
 import { INPUT_BASE_HEIGHT, HOVER, LAYOUT } from "@/Utils/Theme/constants";
-import { typographyLevels } from "@/Utils/Theme/Palette";
+import { typographyLevels, fontWeights } from "@/Utils/Theme/Palette";
 
-const PALETTE_COLORS = [
-	"primary",
-	"secondary",
-	"error",
-	"warning",
-	"info",
-	"success",
-] as const;
-type PaletteColor = (typeof PALETTE_COLORS)[number];
+type ButtonInputProps = ButtonProps &
+	Pick<React.AnchorHTMLAttributes<HTMLAnchorElement>, "target" | "rel">;
 
-export const ButtonInput = ({ sx, ...props }: ButtonProps) => {
+type PaletteColor = "primary" | "secondary" | "error" | "warning" | "info" | "success";
+
+export const ButtonInput = ({ sx, ...props }: ButtonInputProps) => {
 	const theme = useTheme();
 	const colorKey = (props.color ?? "primary") as PaletteColor;
 	const isSmall = props.size === "small";
@@ -57,11 +52,6 @@ export const ButtonInput = ({ sx, ...props }: ButtonProps) => {
 			}
 		: {};
 
-	const focusColor =
-		theme.palette.mode === "dark"
-			? theme.palette.primary.light
-			: theme.palette.primary.main;
-
 	return (
 		<Button
 			{...props}
@@ -70,7 +60,7 @@ export const ButtonInput = ({ sx, ...props }: ButtonProps) => {
 				height: INPUT_BASE_HEIGHT,
 				fontSize: isSmall ? typographyLevels.sm : typographyLevels.m,
 				lineHeight: 1.2,
-				fontWeight: 500,
+				fontWeight: fontWeights.medium,
 				borderRadius: theme.shape.borderRadius,
 				whiteSpace: "nowrap",
 				textOverflow: "ellipsis",
@@ -79,7 +69,7 @@ export const ButtonInput = ({ sx, ...props }: ButtonProps) => {
 				...(isSmall && { px: LAYOUT.SM }),
 				"&:hover": hoverOverrides,
 				"&.Mui-focusVisible": {
-					outline: `2px solid ${focusColor}`,
+					outline: `2px solid ${theme.palette.accent}`,
 					outlineOffset: 1,
 				},
 				...variantSx,

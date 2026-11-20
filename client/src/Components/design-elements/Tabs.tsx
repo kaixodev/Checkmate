@@ -3,8 +3,9 @@ import type { TabsProps } from "@mui/material/Tabs";
 import MuiTab from "@mui/material/Tab";
 import type { TabProps } from "@mui/material/Tab";
 import type { LucideIcon } from "lucide-react";
+import Icon from "./Icon";
 import { useTheme } from "@mui/material/styles";
-import { typographyLevels } from "@/Utils/Theme/Palette";
+import { typographyLevels, fontWeights } from "@/Utils/Theme/Palette";
 import { LAYOUT, SPACING } from "@/Utils/Theme/constants";
 
 interface CustomTabsProps extends TabsProps {}
@@ -33,10 +34,10 @@ export const Tabs = (props: CustomTabsProps) => {
 
 interface CustomTabProps extends TabProps {}
 
-export const TabIcon = ({ icon: IconComponent }: { icon: LucideIcon }) => (
-	<IconComponent
+export const TabIcon = ({ icon }: { icon: LucideIcon }) => (
+	<Icon
+		icon={icon}
 		size={15}
-		strokeWidth={1.5}
 	/>
 );
 
@@ -49,7 +50,7 @@ export const Tab = (props: CustomTabProps) => {
 			sx={{
 				textTransform: "none",
 				fontSize: typographyLevels.m,
-				fontWeight: 400,
+				fontWeight: fontWeights.regular,
 				minHeight: "auto",
 				minWidth: "auto",
 				pt: LAYOUT.XS,
@@ -65,7 +66,7 @@ export const Tab = (props: CustomTabProps) => {
 				},
 				"&.Mui-selected": {
 					color: theme.palette.text.primary,
-					fontWeight: 500,
+					fontWeight: fontWeights.medium,
 					backgroundColor: theme.palette.background.paper,
 					borderBottomColor: theme.palette.background.paper,
 				},
