@@ -6,7 +6,8 @@ import {
 	type StatusPageIncident,
 } from "@/domain/status-page-incidents/status-page-incident.type.js";
 
-type StatusPageIncidentDocumentBase = Omit<StatusPageIncident, "id" | "statusPageId" | "teamId" | "createdAt" | "updatedAt"> & {
+type StatusPageIncidentDocumentBase = Omit<StatusPageIncident, "id" | "statusPageId" | "teamId" | "resolvedAt" | "createdAt" | "updatedAt"> & {
+	resolvedAt?: Date | null;
 	statusPageId: Types.ObjectId;
 	teamId: Types.ObjectId;
 	createdAt: Date;
@@ -54,6 +55,10 @@ const StatusPageIncidentSchema = new Schema<StatusPageIncidentDocument>(
 		active: {
 			type: Boolean,
 			default: true,
+		},
+		resolvedAt: {
+			type: Date,
+			default: null,
 		},
 	},
 	{

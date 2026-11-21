@@ -3,6 +3,8 @@ import { RouteTable } from "@/api/routes/defineRoutes.js";
 import {
 	createStatusPageIncidentBodyValidation,
 	editStatusPageIncidentBodyValidation,
+	publicStatusPageIncidentDayQueryValidation,
+	publicStatusPageIncidentDayResponseSchema,
 	publicStatusPageIncidentHistoryResponseSchema,
 	publicStatusPageIncidentParamValidation,
 	statusPageIncidentCursorQueryValidation,
@@ -80,6 +82,17 @@ export const statusPageIncidentRoutes: RouteTable<IStatusPageIncidentController>
 			errors: [statusPageIncidentErrors.notFound],
 			roles: ["admin", "superadmin"],
 			params: statusPageIncidentIdParamValidation,
+		},
+		{
+			method: "get",
+			path: "/public/:url/day",
+			handler: "getPublicIncidentsForDay",
+			summary: "Get the written incidents that were active on one day of a public status page",
+			errors: [statusPageErrors.unpublished, statusPageErrors.notFound],
+			auth: "statusPage",
+			params: publicStatusPageIncidentParamValidation,
+			query: publicStatusPageIncidentDayQueryValidation,
+			response: publicStatusPageIncidentDayResponseSchema,
 		},
 		{
 			method: "get",

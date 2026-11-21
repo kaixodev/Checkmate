@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import {
 	createStatusPageIncidentBodyValidation,
 	editStatusPageIncidentBodyValidation,
+	publicStatusPageIncidentDayQueryValidation,
 	publicStatusPageIncidentParamValidation,
 	statusPageIncidentCursorQueryValidation,
 	statusPageIncidentIdParamValidation,
@@ -18,6 +19,7 @@ export interface IStatusPageIncidentController {
 	resolveIncident: RequestHandler;
 	deleteIncident: RequestHandler;
 	getPublicIncidentHistory: RequestHandler;
+	getPublicIncidentsForDay: RequestHandler;
 }
 
 class StatusPageIncidentController implements IStatusPageIncidentController {
@@ -76,6 +78,13 @@ class StatusPageIncidentController implements IStatusPageIncidentController {
 		const { cursor } = statusPageIncidentCursorQueryValidation.parse(req.query);
 		const data = await this.statusPageIncidentService.getPublicIncidentHistory({ url, cursor, requesterTeamId: req.user?.teamId });
 		res.json({ success: true, msg: "Status page incidents retrieved successfully", data });
+	};
+
+	getPublicIncidentsForDay: Handler = async (req, res) => {
+		const { url } = publicStatusPageIncidentParamValidation.parse(req.params);
+		const { date } = publicStatusPageIncidentDayQueryValidation.parse(req.query);
+		const incidents = await this.statusPageIncidentService.getPublicIncidentsForDay({ url, date, requesterTeamId: req.user?.teamId });
+		res.json({ success: true, msg: "Status page incidents retrieved successfully", data: { incidents } });
 	};
 }
 

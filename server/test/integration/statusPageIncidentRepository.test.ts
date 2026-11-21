@@ -180,4 +180,46 @@ describe("MongoStatusPageIncidentsRepository", () => {
 			await expect(repo.updateById(incident.id, teamId, { style: "rainbow" })).rejects.toThrow();
 		});
 	});
+
+	describe("findActiveBetween", () => {
+		it("returns incidents active at any point in the window", async () => {
+			const repo = new MongoStatusPageIncidentsRepository();
+			const statusPageId = makeId();
+			const teamId = makeId();
+			const at = (day: number, hour = 12) => new Date(Date.UTC(2026, 10, day, hour));
+			const base = { statusPageId, teamId, content: "C", style: "warning", pinned: false };
+			await StatusPageIncidentModel.collection.insertMany([
+				{ ...base, title: "still open", active: true, resolvedAt: null, createdAt: at(10), updatedAt: at(10) },
+				{ ...base, title: "resolved during", active: false, resolvedAt: at(21, 3), createdAt: at(19), updatedAt: at(21, 3) },
+				{ ...base, title: "resolved before", active: false, resolvedAt: at(20), createdAt: at(18), updatedAt: at(20) },
+				{ ...base, title: "posted after", active: true, resolvedAt: null, createdAt: at(22), updatedAt: at(22) },
+				{ ...base, title: "legacy resolved during", active: false, createdAt: at(15), updatedAt: at(21, 5) },
+				{ ...base, title: "legacy resolved before", active: false, createdAt: at(15), updatedAt: at(16) },
+				{ ...base, statusPageId: makeId(), title: "other page", active: true, resolvedAt: null, createdAt: at(10), updatedAt: at(10) },
+			]);
+
+			const found = await repo.findActiveBetween(statusPageId.toString(), at(21, 0), new Date(Date.UTC(2026, 10, 21, 23, 59, 59, 999)));
+
+			expect(found.map((incident) => incident.title).sort()).toEqual(["legacy resolved during", "resolved during", "still open"]);
+		});
+
+		it("records resolvedAt when resolving through updateById", async () => {
+			const repo = new MongoStatusPageIncidentsRepository();
+			const statusPageId = makeId();
+			const teamId = makeId();
+			const incident = await repo.create({
+				statusPageId: statusPageId.toString(),
+				teamId: teamId.toString(),
+				title: "T",
+				content: "C",
+				style: "info",
+			});
+			expect(incident.resolvedAt).toBeNull();
+
+			const when = new Date().toISOString();
+			const resolved = await repo.updateById(incident.id, teamId.toString(), { active: false, pinned: false, resolvedAt: when });
+
+			expect(resolved.resolvedAt).toBe(when);
+		});
+	});
 });

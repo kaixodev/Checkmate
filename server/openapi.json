@@ -4188,6 +4188,12 @@
 						"example": true,
 						"description": "false once the incident is resolved"
 					},
+					"resolvedAt": {
+						"type": "string",
+						"nullable": true,
+						"example": null,
+						"description": "When the incident was resolved; null while active"
+					},
 					"createdAt": {
 						"type": "string",
 						"example": "2026-04-15T03:21:00.000Z"
@@ -4197,11 +4203,10 @@
 						"example": "2026-04-15T03:34:00.000Z"
 					}
 				},
-				"required": ["id", "statusPageId", "teamId", "title", "content", "style", "pinned", "active", "createdAt", "updatedAt"]
+				"required": ["id", "statusPageId", "teamId", "title", "content", "style", "pinned", "active", "resolvedAt", "createdAt", "updatedAt"]
 			},
 			"PublicStatusPageIncident": {
 				"type": "object",
-				"nullable": true,
 				"properties": {
 					"id": {
 						"type": "string",
@@ -4231,6 +4236,12 @@
 						"example": true,
 						"description": "false once the incident is resolved"
 					},
+					"resolvedAt": {
+						"type": "string",
+						"nullable": true,
+						"example": null,
+						"description": "When the incident was resolved; null while active"
+					},
 					"createdAt": {
 						"type": "string",
 						"example": "2026-04-15T03:21:00.000Z"
@@ -4240,7 +4251,7 @@
 						"example": "2026-04-15T03:34:00.000Z"
 					}
 				},
-				"required": ["id", "title", "content", "style", "pinned", "active", "createdAt", "updatedAt"]
+				"required": ["id", "title", "content", "style", "pinned", "active", "resolvedAt", "createdAt", "updatedAt"]
 			},
 			"LogEntry": {
 				"type": "object",
@@ -16929,6 +16940,126 @@
 				}
 			}
 		},
+		"/status-page-incidents/public/{url}/day": {
+			"get": {
+				"tags": ["status-page-incident"],
+				"summary": "Get the written incidents that were active on one day of a public status page",
+				"parameters": [
+					{
+						"schema": {
+							"type": "string",
+							"minLength": 1
+						},
+						"required": true,
+						"name": "url",
+						"in": "path"
+					},
+					{
+						"schema": {
+							"type": "string",
+							"format": "date"
+						},
+						"required": true,
+						"name": "date",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"enum": [true]
+										},
+										"msg": {
+											"type": "string"
+										},
+										"data": {
+											"type": "object",
+											"properties": {
+												"incidents": {
+													"type": "array",
+													"items": {
+														"$ref": "#/components/schemas/PublicStatusPageIncident"
+													}
+												}
+											},
+											"required": ["incidents"]
+										}
+									},
+									"required": ["success", "msg", "data"]
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Status page is unpublished and the caller is not on its team",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Status page not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too many requests",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/status-page-incidents/public/{url}": {
 			"get": {
 				"tags": ["status-page-incident"],
@@ -16972,7 +17103,14 @@
 											"type": "object",
 											"properties": {
 												"pinned": {
-													"$ref": "#/components/schemas/PublicStatusPageIncident"
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/PublicStatusPageIncident"
+														},
+														{
+															"nullable": true
+														}
+													]
 												},
 												"incidents": {
 													"type": "array",

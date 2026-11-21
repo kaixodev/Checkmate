@@ -31,6 +31,10 @@ export const publicStatusPageIncidentParamValidation = z.object({
 	url: z.string().min(1, "URL is required"),
 });
 
+export const publicStatusPageIncidentDayQueryValidation = z.object({
+	date: z.string().date("Date must be a valid calendar date in YYYY-MM-DD format"),
+});
+
 export const createStatusPageIncidentBodyValidation = z
 	.object({
 		title: titleValidation,
@@ -63,6 +67,10 @@ export const publicStatusPageIncidentHistoryResponseSchema = z.object({
 	pinned: publicStatusPageIncidentSchema.nullable(),
 	incidents: z.array(publicStatusPageIncidentSchema),
 	...pageShape,
+});
+
+export const publicStatusPageIncidentDayResponseSchema = z.object({
+	incidents: z.array(publicStatusPageIncidentSchema),
 });
 
 export const unpinStatusPageIncidentsResponseSchema = z.object({

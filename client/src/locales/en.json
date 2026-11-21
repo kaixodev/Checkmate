@@ -2063,7 +2063,10 @@
 					"loading": "Loading...",
 					"noIncidents": "No incidents reported for this day.",
 					"ongoing": "Ongoing",
-					"errorLoading": "Failed to load incidents."
+					"errorLoading": "Failed to load incidents.",
+					"postedUpdates": "Posted updates",
+					"monitorIncidents": "Monitor incidents",
+					"noMonitorIncidents": "No incidents for this monitor on this day."
 				}
 			},
 			"statusBar": {

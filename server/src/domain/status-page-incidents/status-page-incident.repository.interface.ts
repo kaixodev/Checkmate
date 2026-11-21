@@ -7,11 +7,12 @@ export interface IStatusPageIncidentsRepository {
 	findById(id: string, teamId: string): Promise<StatusPageIncident>;
 	findByStatusPageId(statusPageId: string, cursor: string | undefined, limit: number): Promise<StatusPageIncidentPage<StatusPageIncident>>;
 	findPinnedByStatusPageId(statusPageId: string): Promise<StatusPageIncident | null>;
+	findActiveBetween(statusPageId: string, start: Date, end: Date): Promise<StatusPageIncident[]>;
 	// update
 	updateById(
 		id: string,
 		teamId: string,
-		data: Partial<Pick<StatusPageIncident, "title" | "content" | "style" | "pinned" | "active">>
+		data: Partial<Pick<StatusPageIncident, "title" | "content" | "style" | "pinned" | "active" | "resolvedAt">>
 	): Promise<StatusPageIncident>;
 	unpinByStatusPageId(statusPageId: string, teamId: string): Promise<number>;
 	// delete

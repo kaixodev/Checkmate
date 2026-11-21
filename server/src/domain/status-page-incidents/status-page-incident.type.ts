@@ -5,6 +5,7 @@ export const StatusPageIncidentStyles = ["info", "warning", "danger", "primary",
 export type StatusPageIncidentStyle = (typeof StatusPageIncidentStyles)[number];
 
 export const STATUS_PAGE_INCIDENT_PAGE_SIZE = 10;
+export const STATUS_PAGE_INCIDENT_DAY_LIMIT = 50;
 export const STATUS_PAGE_INCIDENT_TITLE_MAX = 255;
 export const STATUS_PAGE_INCIDENT_CONTENT_MAX = 10000;
 

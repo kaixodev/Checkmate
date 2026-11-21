@@ -19,6 +19,7 @@ export interface PublicStatusPageIncident {
 	style: StatusPageIncidentStyle;
 	pinned: boolean;
 	active: boolean;
+	resolvedAt: string | null;
 	createdAt: string;
 	updatedAt: string;
 }

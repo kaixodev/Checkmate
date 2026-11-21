@@ -1,4 +1,8 @@
-import type { StatusPageIncident, StatusPageIncidentPage } from "@/domain/status-page-incidents/status-page-incident.type.js";
+import {
+	STATUS_PAGE_INCIDENT_DAY_LIMIT,
+	type StatusPageIncident,
+	type StatusPageIncidentPage,
+} from "@/domain/status-page-incidents/status-page-incident.type.js";
 import { type StatusPageIncidentDocument, StatusPageIncidentModel } from "@/domain/status-page-incidents/status-page-incident.model.js";
 import { IStatusPageIncidentsRepository } from "./status-page-incident.repository.interface.js";
 import mongoose from "mongoose";
@@ -28,6 +32,7 @@ class MongoStatusPageIncidentsRepository implements IStatusPageIncidentsReposito
 			style: doc.style,
 			pinned: doc.pinned,
 			active: doc.active,
+			resolvedAt: doc.resolvedAt ? toDateString(doc.resolvedAt) : null,
 			createdAt: toDateString(doc.createdAt),
 			updatedAt: toDateString(doc.updatedAt),
 		};
@@ -79,10 +84,23 @@ class MongoStatusPageIncidentsRepository implements IStatusPageIncidentsReposito
 		return incident ? this.toEntity(incident) : null;
 	};
 
+	// Incidents that were active at some point in [start, end]: posted before the end and not resolved before the start.
+	// Incidents resolved before resolvedAt existed fall back to updatedAt, which resolving also set.
+	findActiveBetween = async (statusPageId: string, start: Date, end: Date): Promise<StatusPageIncident[]> => {
+		const documents = await StatusPageIncidentModel.find({
+			statusPageId: new mongoose.Types.ObjectId(statusPageId),
+			createdAt: { $lte: end },
+			$or: [{ active: true }, { resolvedAt: { $gte: start } }, { active: false, resolvedAt: null, updatedAt: { $gte: start } }],
+		})
+			.sort({ createdAt: -1, _id: -1 })
+			.limit(STATUS_PAGE_INCIDENT_DAY_LIMIT);
+		return this.mapDocuments(documents);
+	};
+
 	updateById = async (
 		id: string,
 		teamId: string,
-		data: Partial<Pick<StatusPageIncident, "title" | "content" | "style" | "pinned" | "active">>
+		data: Partial<Pick<StatusPageIncident, "title" | "content" | "style" | "pinned" | "active" | "resolvedAt">>
 	): Promise<StatusPageIncident> => {
 		const updated = await StatusPageIncidentModel.findOneAndUpdate(
 			{

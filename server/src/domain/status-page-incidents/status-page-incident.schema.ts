@@ -11,6 +11,7 @@ export const statusPageIncidentSchema = z
 		style: z.enum(StatusPageIncidentStyles).meta({ example: "warning" }),
 		pinned: z.boolean().meta({ example: true, description: "Shown as the banner at the top of the status page" }),
 		active: z.boolean().meta({ example: true, description: "false once the incident is resolved" }),
+		resolvedAt: z.string().nullable().meta({ example: null, description: "When the incident was resolved; null while active" }),
 		createdAt: z.string().meta({ example: "2026-04-15T03:21:00.000Z" }),
 		updatedAt: z.string().meta({ example: "2026-04-15T03:34:00.000Z" }),
 	})
@@ -24,6 +25,7 @@ export const publicStatusPageIncidentSchema = statusPageIncidentSchema
 		style: true,
 		pinned: true,
 		active: true,
+		resolvedAt: true,
 		createdAt: true,
 		updatedAt: true,
 	})

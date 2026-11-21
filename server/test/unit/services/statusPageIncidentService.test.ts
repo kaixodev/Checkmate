@@ -18,6 +18,7 @@ const makeIncident = (overrides?: Partial<StatusPageIncident>): StatusPageIncide
 	style: "warning",
 	pinned: true,
 	active: true,
+	resolvedAt: null,
 	createdAt: "2026-11-19T08:00:00.000Z",
 	updatedAt: "2026-11-19T08:00:00.000Z",
 	...overrides,
@@ -29,6 +30,7 @@ const createIncidentsRepo = () =>
 		findById: jest.fn().mockResolvedValue(makeIncident()),
 		findByStatusPageId: jest.fn().mockResolvedValue({ incidents: [makeIncident()], total: 1, nextCursor: null, hasMore: false }),
 		findPinnedByStatusPageId: jest.fn().mockResolvedValue(makeIncident()),
+		findActiveBetween: jest.fn().mockResolvedValue([makeIncident()]),
 		updateById: jest.fn().mockResolvedValue(makeIncident()),
 		unpinByStatusPageId: jest.fn().mockResolvedValue(1),
 		deleteById: jest.fn().mockResolvedValue(makeIncident()),
@@ -90,12 +92,16 @@ describe("StatusPageIncidentService", () => {
 	});
 
 	describe("resolveIncident", () => {
-		it("marks the incident inactive and unpins it", async () => {
+		it("marks the incident inactive, unpins it and records when", async () => {
 			const { service, statusPageIncidentsRepository } = setup();
 
 			await service.resolveIncident({ id: "inc-1", teamId: "team-1" });
 
-			expect(statusPageIncidentsRepository.updateById).toHaveBeenCalledWith("inc-1", "team-1", { active: false, pinned: false });
+			expect(statusPageIncidentsRepository.updateById).toHaveBeenCalledWith("inc-1", "team-1", {
+				active: false,
+				pinned: false,
+				resolvedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T/),
+			});
 		});
 	});
 
@@ -169,6 +175,32 @@ describe("StatusPageIncidentService", () => {
 			const result = await service.getPublicIncidentHistory({ url: "my-status-page", requesterTeamId: "team-1" });
 
 			expect(result.incidents).toHaveLength(1);
+		});
+	});
+
+	describe("getPublicIncidentsForDay", () => {
+		it("looks up the whole day in the status page's timezone, without team fields", async () => {
+			const { service, statusPagesRepository, statusPageIncidentsRepository } = setup();
+			statusPagesRepository.findByUrl.mockResolvedValue(makeStatusPage({ isPublished: true, timezone: "Asia/Tokyo" }));
+
+			const result = await service.getPublicIncidentsForDay({ url: "my-status-page", date: "2026-11-21" });
+
+			expect(statusPageIncidentsRepository.findActiveBetween).toHaveBeenCalledWith(
+				"sp-1",
+				new Date("2026-11-20T15:00:00.000Z"),
+				new Date("2026-11-21T14:59:59.999Z")
+			);
+			expect(result[0]).toEqual(expect.objectContaining({ id: "inc-1", resolvedAt: null }));
+			expect(result[0]).not.toHaveProperty("teamId");
+		});
+
+		it("throws unpublished for an anonymous caller on an unpublished page", async () => {
+			const { service, statusPagesRepository } = setup();
+			statusPagesRepository.findByUrl.mockResolvedValue(makeStatusPage({ isPublished: false }));
+
+			await expect(service.getPublicIncidentsForDay({ url: "my-status-page", date: "2026-11-21" })).rejects.toMatchObject({
+				status: statusPageErrors.unpublished.status,
+			});
 		});
 	});
 });

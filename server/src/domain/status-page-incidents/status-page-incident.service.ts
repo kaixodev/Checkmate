@@ -8,6 +8,12 @@ import {
 	type StatusPageIncidentStyle,
 } from "@/domain/status-page-incidents/status-page-incident.type.js";
 import { AppError } from "@/utils/AppError.js";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc.js";
+import timezone from "dayjs/plugin/timezone.js";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 import { statusPageErrors } from "@/domain/status-pages/status-page.errors.js";
 
 const SERVICE_NAME = "StatusPageIncidentService";
@@ -34,6 +40,7 @@ export interface IStatusPageIncidentService {
 	unpinIncidents(params: { teamId: string; statusPageId: string }): Promise<number>;
 	deleteIncident(params: { id: string; teamId: string }): Promise<StatusPageIncident>;
 	getPublicIncidentHistory(params: { url: string; cursor?: string; requesterTeamId?: string }): Promise<PublicStatusPageIncidentHistory>;
+	getPublicIncidentsForDay(params: { url: string; date: string; requesterTeamId?: string }): Promise<PublicStatusPageIncident[]>;
 }
 
 export class StatusPageIncidentService implements IStatusPageIncidentService {
@@ -59,6 +66,7 @@ export class StatusPageIncidentService implements IStatusPageIncidentService {
 		style: incident.style,
 		pinned: incident.pinned,
 		active: incident.active,
+		resolvedAt: incident.resolvedAt,
 		createdAt: incident.createdAt,
 		updatedAt: incident.updatedAt,
 	});
@@ -108,7 +116,7 @@ export class StatusPageIncidentService implements IStatusPageIncidentService {
 
 	// Resolving ends the incident and takes it off the banner; it stays in the history.
 	resolveIncident = async ({ id, teamId }: { id: string; teamId: string }): Promise<StatusPageIncident> => {
-		return await this.statusPageIncidentsRepository.updateById(id, teamId, { active: false, pinned: false });
+		return await this.statusPageIncidentsRepository.updateById(id, teamId, { active: false, pinned: false, resolvedAt: new Date().toISOString() });
 	};
 
 	// Unpinning only hides the banner; the incident stays active in the history.
@@ -119,6 +127,33 @@ export class StatusPageIncidentService implements IStatusPageIncidentService {
 
 	deleteIncident = async ({ id, teamId }: { id: string; teamId: string }): Promise<StatusPageIncident> => {
 		return await this.statusPageIncidentsRepository.deleteById(id, teamId);
+	};
+
+	// Written incidents that were active on a calendar day in the status page's timezone
+	getPublicIncidentsForDay = async ({
+		url,
+		date,
+		requesterTeamId,
+	}: {
+		url: string;
+		date: string;
+		requesterTeamId?: string;
+	}): Promise<PublicStatusPageIncident[]> => {
+		const statusPage = await this.statusPagesRepository.findByUrl(url);
+
+		if (!statusPage.isPublished) {
+			if (!requesterTeamId || statusPage.teamId !== requesterTeamId) {
+				throw new AppError(statusPageErrors.unpublished, { service: SERVICE_NAME });
+			}
+		}
+
+		const day = dayjs.tz(date, statusPage.timezone);
+		const incidents = await this.statusPageIncidentsRepository.findActiveBetween(
+			statusPage.id,
+			day.startOf("day").toDate(),
+			day.endOf("day").toDate()
+		);
+		return incidents.map(this.toPublicIncident);
 	};
 
 	getPublicIncidentHistory = async ({
